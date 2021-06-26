@@ -19,19 +19,17 @@ type Classroom struct {
 	Creator struct {
 		Uid  string `json:"uid"`
 		Name string `json:"name"`
-	}`json:"creator"`
+	} `json:"creator"`
 	Members []struct {
 		Uid  string `json:"uid"`
 		Name string `json:"name"`
-		Role Role `json:"role"`
-	}`json:"members"`
+		Role Role   `json:"role"`
+	} `json:"members"`
 	CoursePlan course.CoursePlan `json:"course_plan"`
-	Grades []struct{
+	Grades     []struct {
 		Event Test `json:"event"`
-		Students
 	} `json:"grades"`
 }
 
 type Test struct {
-
 }

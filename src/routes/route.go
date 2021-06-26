@@ -3,6 +3,7 @@ package routes
 import (
 	"net/http"
 
+	"github.com/J-HowHuang/bow-code/course"
 	"github.com/J-HowHuang/bow-code/user"
 	"github.com/gorilla/mux"
 )
@@ -21,6 +22,10 @@ func init() {
 	register("GET", "/user", user.GetUsers, nil)
 	register("GET", "/user/{id}", user.GetUserByID, nil)
 	register("PUT", "/user/{id}", user.UpdateUserByID, nil)
+	/***************** Course *****************/
+	register("GET", "/course", course.GetAll, nil)
+	register("POST", "/course", course.CreateNew, nil)
+	register("GET", "/course/{id}", course.GetCourseByID, nil)
 }
 
 func NewRouter() *mux.Router {
