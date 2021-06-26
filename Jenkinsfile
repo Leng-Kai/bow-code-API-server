@@ -11,7 +11,7 @@ pipeline {
     	stage('Clone') {
             steps {
                 echo 'Cloning..'
-                sh "rm -rf ./*"
+                sh "rm -rf ./bow-code-API-server"
                 sh "git clone $GITHUB_REPO_URL"
                 sh "ls"
             }
