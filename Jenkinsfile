@@ -3,11 +3,20 @@ pipeline {
     agent any
     
     environment {
-        PARAM = "value"
+        GITHUB_REPO_URL = "https://github.com/Leng-Kai/bow-code-API-server"
     }
     
     stages {
         
+	stage('Clone') {
+            steps {
+                echo 'Cloning..'
+                sh "rm -rf ./*"
+                sh "git clone $GITHUB_REPO_URL"
+                sh "ls"
+            }
+        }
+
         stage('Build') {
             steps {
                 echo 'Building..'
