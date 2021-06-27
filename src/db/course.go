@@ -4,25 +4,16 @@ import (
 	"context"
 	"time"
 
-	. "github.com/Leng-Kai/bow-code-API-server/course"
-
+	. "github.com/Leng-Kai/bow-code-API-server/schemas"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var courses *mongo.Collection
-
-func init() {
-	courses = db.Database("CourseDB").Collection("courses")
-}
-
-func CreateCourse(newCourse Course) (CourseID, error) {
+func CreateCourse(newCourse Course) (ID, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-
 	res, err := courses.InsertOne(ctx, newCourse)
-	return res.InsertedID.(CourseID), err
+	return res.InsertedID.(ID), err
 }
 
 func GetSingleCourse(filter Filter, sortby Sortby) (Course, error) {

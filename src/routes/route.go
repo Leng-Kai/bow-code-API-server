@@ -3,8 +3,8 @@ package routes
 import (
 	"net/http"
 
-	"github.com/Leng-kai/bow-code-API-server/course"
-	"github.com/Leng-kai/bow-code-API-server/user"
+	"github.com/Leng-Kai/bow-code-API-server/course"
+	"github.com/Leng-Kai/bow-code-API-server/user"
 	"github.com/gorilla/mux"
 )
 
@@ -26,6 +26,11 @@ func init() {
 	register("GET", "/course", course.GetAll, nil)
 	register("POST", "/course", course.CreateNew, nil)
 	register("GET", "/course/{id}", course.GetCourseByID, nil)
+	register("GET", "/", healthyCheck, nil)
+}
+
+func healthyCheck(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(200)
 }
 
 func NewRouter() *mux.Router {

@@ -8,13 +8,12 @@ import (
 	"time"
 
 	"github.com/Leng-Kai/bow-code-API-server/db"
-	"github.com/gorilla/mux"
+	"github.com/Leng-Kai/bow-code-API-server/routes"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
-	r := mux.NewRouter()
 	db_url := os.Getenv("DB_URL")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -36,6 +35,7 @@ func main() {
 		log.Fatal(err)
 	}
 	db.InitDB(client)
-
-	http.ListenAndServe(":8080", r)
+	r := routes.NewRouter()
+	http.Handle("/", r)
+	http.ListenAndServe(":8080", nil)
 }
