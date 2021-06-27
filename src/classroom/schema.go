@@ -1,6 +1,6 @@
 package classroom
 
-import "github.com/J-HowHuang/bow-code/course"
+import "github.com/Lengkai/bow-code-API-server/course"
 
 type Role int
 

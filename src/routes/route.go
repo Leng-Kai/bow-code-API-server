@@ -3,8 +3,8 @@ package routes
 import (
 	"net/http"
 
-	"github.com/J-HowHuang/bow-code/course"
-	"github.com/J-HowHuang/bow-code/user"
+	"github.com/Leng-kai/bow-code-API-server/course"
+	"github.com/Leng-kai/bow-code-API-server/user"
 	"github.com/gorilla/mux"
 )
 

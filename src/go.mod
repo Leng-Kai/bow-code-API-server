@@ -1,4 +1,4 @@
-module github.com/J-HowHuang/bow-code
+module github.com/Leng-Kai/bow-code-API-server
 
 go 1.16
 
