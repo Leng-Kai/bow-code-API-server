@@ -3,12 +3,15 @@ package course
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/Leng-Kai/bow-code-API-server/db"
 	"github.com/Leng-Kai/bow-code-API-server/schemas"
 	"github.com/Leng-Kai/bow-code-API-server/util"
+	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func GetAll(w http.ResponseWriter, r *http.Request) {
@@ -44,5 +47,20 @@ func CreateNew(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetCourseByID(w http.ResponseWriter, r *http.Request) {
-
+	id := mux.Vars(r)["id"]
+	objId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		// invalid id format
+		log.Println(err)
+	}
+	filter := bson.D{{"_id", objId}}
+	sortby := bson.D{}
+	course, err := db.GetSingleCourse(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "course not found.", 404)
+		return
+	}
+	util.ResponseJSON(w, course)
 }
