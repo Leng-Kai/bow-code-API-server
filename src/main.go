@@ -9,6 +9,7 @@ import (
 
 	"github.com/Leng-Kai/bow-code-API-server/db"
 	"github.com/Leng-Kai/bow-code-API-server/routes"
+	_ "github.com/joho/godotenv/autoload"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
