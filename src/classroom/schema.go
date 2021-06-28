@@ -1,6 +1,6 @@
 package classroom
 
-import "github.com/Lengkai/bow-code-API-server/course"
+import . "github.com/Leng-Kai/bow-code-API-server/schemas"
 
 type Role int
 
@@ -25,7 +25,7 @@ type Classroom struct {
 		Name string `json:"name"`
 		Role Role   `json:"role"`
 	} `json:"members"`
-	CoursePlan course.CoursePlan `json:"course_plan"`
+	CoursePlan CoursePlan `json:"course_plan"`
 	Grades     []struct {
 		Event Test `json:"event"`
 	} `json:"grades"`
