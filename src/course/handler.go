@@ -1,6 +1,7 @@
 package course
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -125,4 +126,36 @@ func CreateBlock(w http.ResponseWriter, r *http.Request) {
 		// update failed
 	}
 	util.ResponseJSON(w, course)
+}
+
+func GetBlocksTitle(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	docsPath := os.Getenv("DOCS_PATH")
+
+	type response struct {
+		Id    string
+		Title string
+	}
+	var resp []response
+	files, err := ioutil.ReadDir(path.Join(docsPath, "course", id, "block"))
+	if err != nil {
+		// failed to read dir
+	}
+	for _, fileInfo := range files {
+		f, err := os.Open(path.Join(docsPath, "course", id, "block", fileInfo.Name()))
+		if err != nil {
+			// failed to open file
+		}
+		reader := bufio.NewReader(f)
+		title, _, err := reader.ReadLine()
+		if err != nil {
+			// failed to read file
+		}
+		block := response{
+			Id:    fileInfo.Name(),
+			Title: string(title),
+		}
+		resp = append(resp, block)
+	}
+	util.ResponseJSON(w, resp)
 }
