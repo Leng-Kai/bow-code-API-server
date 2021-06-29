@@ -119,7 +119,7 @@ func CreateBlock(w http.ResponseWriter, r *http.Request) {
 		// Error to write to file
 		log.Println(err)
 	}
-	/** Read first line of html (as title) **/
+
 	sc := bufio.NewScanner(strings.NewReader(string(blockContent)))
 	sc.Scan()
 	title := sc.Text()
@@ -132,4 +132,15 @@ func CreateBlock(w http.ResponseWriter, r *http.Request) {
 		// update failed
 	}
 	util.ResponseJSON(w, course)
+}
+
+func GetBlock(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	docsPath := os.Getenv("DOCS_PATH")
+	blockId := mux.Vars(r)["bid"]
+	blockContent, err := ioutil.ReadFile(path.Join(docsPath, "course", id, "block", blockId))
+	if err != nil {
+		// failed to read file
+	}
+	util.ResponseHTML(w, string(blockContent))
 }
