@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"strings"
 
 	"github.com/Leng-Kai/bow-code-API-server/db"
 	"github.com/Leng-Kai/bow-code-API-server/schemas"
@@ -118,44 +119,17 @@ func CreateBlock(w http.ResponseWriter, r *http.Request) {
 		// Error to write to file
 		log.Println(err)
 	}
+	/** Read first line of html (as title) **/
+	sc := bufio.NewScanner(strings.NewReader(string(blockContent)))
+	sc.Scan()
+	title := sc.Text()
 
 	filter := bson.D{{"_id", objId}}
-	update := bson.D{{"$push", bson.D{{"blockList", strconv.Itoa(newBlockID)}}}}
+	blockEntry := bson.D{{"title", title}, {"ID", strconv.Itoa(newBlockID)}}
+	update := bson.D{{"$push", bson.D{{"blockList", blockEntry}}}}
 	course, err := db.UpdateCourse(filter, update, false)
 	if err != nil {
 		// update failed
 	}
 	util.ResponseJSON(w, course)
-}
-
-func GetBlocksTitle(w http.ResponseWriter, r *http.Request) {
-	id := mux.Vars(r)["id"]
-	docsPath := os.Getenv("DOCS_PATH")
-
-	type response struct {
-		Id    string
-		Title string
-	}
-	var resp []response
-	files, err := ioutil.ReadDir(path.Join(docsPath, "course", id, "block"))
-	if err != nil {
-		// failed to read dir
-	}
-	for _, fileInfo := range files {
-		f, err := os.Open(path.Join(docsPath, "course", id, "block", fileInfo.Name()))
-		if err != nil {
-			// failed to open file
-		}
-		reader := bufio.NewReader(f)
-		title, _, err := reader.ReadLine()
-		if err != nil {
-			// failed to read file
-		}
-		block := response{
-			Id:    fileInfo.Name(),
-			Title: string(title),
-		}
-		resp = append(resp, block)
-	}
-	util.ResponseJSON(w, resp)
 }

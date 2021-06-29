@@ -17,9 +17,12 @@ type CourseBlock struct {
 }
 
 type Course struct {
-	CourseID  ID       `json:"id" bson:"_id,omitempty"`
-	BlockList []string `json:"blockList" bson:"blockList"`
-	Creator   ID       `json:"creator" bson:"creator"`
+	CourseID  ID `json:"id" bson:"_id,omitempty"`
+	BlockList []struct {
+		Title string `json:"title"`
+		ID    string `json:"id"`
+	} `json:"blockList" bson:"blockList"`
+	Creator ID `json:"creator" bson:"creator"`
 }
 
 type CoursePlan struct {

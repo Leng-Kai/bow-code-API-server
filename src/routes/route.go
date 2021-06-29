@@ -27,7 +27,6 @@ func init() {
 	register("POST", "/course", course.CreateNew, nil)
 	register("GET", "/course/{id}", course.GetCourseByID, nil)
 	register("POST", "/course/{id}/block", course.CreateBlock, nil)
-	register("GET", "/course/{id}/block", course.GetBlocksTitle, nil)
 	/******************************************/
 	register("GET", "/", healthyCheck, nil)
 }
