@@ -90,9 +90,6 @@ func CreateBlock(w http.ResponseWriter, r *http.Request) {
 	}
 
 	files, err := ioutil.ReadDir(path.Join(docsPath, "course", id, "block"))
-	for _, file := range files {
-		fmt.Println(file.Name())
-	}
 	newBlockPath := path.Join(docsPath, "course", id, "block")
 
 	/** Make directory if dir not exist **/
@@ -127,11 +124,11 @@ func CreateBlock(w http.ResponseWriter, r *http.Request) {
 	filter := bson.D{{"_id", objId}}
 	blockEntry := bson.D{{"title", title}, {"ID", strconv.Itoa(newBlockID)}}
 	update := bson.D{{"$push", bson.D{{"blockList", blockEntry}}}}
-	course, err := db.UpdateCourse(filter, update, false)
+	_, err = db.UpdateCourse(filter, update, false)
 	if err != nil {
 		// update failed
 	}
-	util.ResponseJSON(w, course)
+	w.WriteHeader(200)
 }
 
 func GetBlock(w http.ResponseWriter, r *http.Request) {
