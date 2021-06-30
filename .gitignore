@@ -1,1 +1,3 @@
 db/*
+content/*
+src/.env

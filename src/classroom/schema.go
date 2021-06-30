@@ -1,6 +1,6 @@
 package classroom
 
-import "github.com/J-HowHuang/bow-code/course"
+import . "github.com/Leng-Kai/bow-code-API-server/schemas"
 
 type Role int
 
@@ -19,19 +19,17 @@ type Classroom struct {
 	Creator struct {
 		Uid  string `json:"uid"`
 		Name string `json:"name"`
-	}`json:"creator"`
+	} `json:"creator"`
 	Members []struct {
 		Uid  string `json:"uid"`
 		Name string `json:"name"`
-		Role Role `json:"role"`
-	}`json:"members"`
-	CoursePlan course.CoursePlan `json:"course_plan"`
-	Grades []struct{
+		Role Role   `json:"role"`
+	} `json:"members"`
+	CoursePlan CoursePlan `json:"course_plan"`
+	Grades     []struct {
 		Event Test `json:"event"`
-		Students
 	} `json:"grades"`
 }
 
 type Test struct {
-
 }
