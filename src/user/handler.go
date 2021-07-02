@@ -84,7 +84,16 @@ func Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUserByID(w http.ResponseWriter, r *http.Request) {
-
+	id := mux.Vars(r)["id"]
+	filter := bson.D{{"_id", id}}
+	sortby := bson.D{}
+	user, err := db.GetSingleUser(filter, sortby)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "user not found.", 404)
+		return
+	}
+	util.ResponseJSON(w, user)
 }
 
 func UpdateUserByID(w http.ResponseWriter, r *http.Request){
