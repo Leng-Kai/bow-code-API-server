@@ -19,7 +19,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	auth_payload := mux.Vars(r)["authPayload"]
-	auth_uid, err := authenticator(auth_payload)
+	auth_uid, userInfo, err := authenticator(auth_payload)
 	if err != nil {
 		// errr may contain error message
 	}
@@ -38,14 +38,17 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// If not, create a new user
-	newUser := schemas.User{}
-	id, err := db.CreateUser(newUser)
+	newUser := schemas.User{
+		UserID: global_uid,
+		RegisterType: method,
+		UserInfo: userInfo,
+		Super: false
+	}
+	_, err := db.CreateUser(newUser)
 	if err != nil {
 		// db error
 	} else {
-		resp := struct {
-			UserID	schemas.UserID
-		}{UserID: id}
+		resp := newUser
 		util.ResponseJSON(w, resp)
 	}
 }
