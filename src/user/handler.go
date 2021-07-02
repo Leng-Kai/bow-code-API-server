@@ -30,11 +30,12 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	filter := bson.D{{"_id", global_uid}}
 	sortby := bson.D{}
 	user, err := db.GetSingleUser(filter, sortby)
-	if err != nil {
-		// db error
-	}
-	if user.UserID != "" {
-		// user already exist
+	if err != mongo.ErrNoDocuments {
+		if err == nil {
+			// user already exist
+		} else {
+			// db error
+		}
 	}
 
 	// If not, create a new user
@@ -48,13 +49,38 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// db error
 	} else {
-		resp := newUser
-		util.ResponseJSON(w, resp)
+		util.ResponseJSON(w, newUser)
 	}
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
+	method := mux.Vars(r)["method"]
+	authenticator, ok := authHandler[method]
+	if !ok {
+		// unsupported register method
+	}
 
+	auth_payload := mux.Vars(r)["authPayload"]
+	auth_uid, userInfo, err := authenticator(auth_payload)
+	if err != nil {
+		// err may contain error message
+	}
+
+	global_uid := globalUid(method, auth_uid)
+
+	// Check if user already exist
+	filter := bson.D{{"_id", global_uid}}
+	sortby := bson.D{}
+	user, err := db.GetSingleUser(filter, sortby)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			// user not exist
+		} else {
+			// db error
+		}
+	}
+
+	util.ResponseJSON(w, user)
 }
 
 func GetUserByID(w http.ResponseWriter, r *http.Request) {
