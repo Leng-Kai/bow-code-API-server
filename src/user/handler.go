@@ -27,13 +27,18 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	method := msg["method"]
 	authenticator, ok := authHandler[method]
 	if !ok {
-		// unsupported register method
+		log.Println(err)
+		http.Error(w, "unsupported register method.", 404)
+		return
 	}
 
 	auth_payload := msg["authPayload"]
 	auth_uid, userInfo, err := authenticator(auth_payload)
 	if err != nil {
 		// err may contain error message
+		log.Println(err)
+		http.Error(w, "failed to authenticate.", 404)
+		return
 	}
 
 	global_uid := globalUid(method, auth_uid)
@@ -82,12 +87,18 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	authenticator, ok := authHandler[method]
 	if !ok {
 		// unsupported register method
+		log.Println(err)
+		http.Error(w, "unsupported register method.", 404)
+		return
 	}
 
 	auth_payload := msg["authPayload"]
 	auth_uid, userInfo, err := authenticator(auth_payload)
 	if err != nil {
 		// err may contain error message
+		log.Println(err)
+		http.Error(w, "failed to authenticate.", 404)
+		return
 	}
 
 	global_uid := globalUid(method, auth_uid)
@@ -99,6 +110,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			// user not exist
+			log.Println("user already exist.")
+			http.Error(w, "user not exist.", 404)
+			return
 		} else {
 			// db error
 		}
