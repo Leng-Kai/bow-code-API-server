@@ -2,6 +2,8 @@ package user
 
 import (
 	"fmt"
+
+	. "github.com/Leng-Kai/bow-code-API-server/schemas"
 )
 
 type authFunc func(interface{}) (string, UserInfo, error)
@@ -18,7 +20,7 @@ func globalUid(method string, auth_uid string) string {
 
 func googleAuthenticator(payload interface{}) (string, UserInfo, error) {
 	name := "George"
-	avatar := "avatar_url"
+	avatar := "new_avatar_url"
 	return "googleUidForTesting", UserInfo{name, avatar}, nil
 }
 
