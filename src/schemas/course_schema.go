@@ -1,6 +1,8 @@
 package schemas
 
 import (
+	"time"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -24,7 +26,12 @@ type Course struct {
 		Title string `json:"title"`
 		ID    string `json:"id"`
 	} `json:"blockList" bson:"blockList"`
-	Creator ID `json:"creator" bson:"creator"`
+	Creator    ID        `json:"creator" bson:"creator"`
+	Tags       []string  `json:"tags" bson:"tags"`
+	Difficulty int       `json:"difficulty" bson:"difficulty"`
+	IsPublic   bool      `json:"isPublic" bson:"isPublic"`
+	CreateTime time.Time `json:"createTime" bson:"createTime"`
+	Views      int       `json:"views" bson:"views"`
 }
 
 type CoursePlan struct {
