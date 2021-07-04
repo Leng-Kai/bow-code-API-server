@@ -11,5 +11,5 @@ var users *mongo.Collection
 func InitDB(client *mongo.Client) {
 	db = client
 	courses = db.Database("CourseDB").Collection("courses")
-	users = db.Database("CourseDB").Collection("users")
+	users = db.Database("UserDB").Collection("users")
 }
