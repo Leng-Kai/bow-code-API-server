@@ -3,7 +3,6 @@ package course
 import (
 	"bufio"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -11,6 +10,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/Leng-Kai/bow-code-API-server/db"
 	"github.com/Leng-Kai/bow-code-API-server/schemas"
@@ -32,7 +32,6 @@ func GetAll(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		//handle error
 	}
-	fmt.Print(allCourse)
 	util.ResponseJSON(w, allCourse)
 }
 
@@ -46,6 +45,8 @@ func CreateNew(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// http.Error()
 	}
+	newCourse.CreateTime = time.Now()
+	newCourse.Views = 0
 	id, err := db.CreateCourse(newCourse)
 	if err != nil {
 		//http.Error()
