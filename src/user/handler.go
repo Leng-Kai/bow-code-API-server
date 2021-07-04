@@ -2,15 +2,16 @@ package user
 
 import (
 	"encoding/json"
-	"net/http"
 	"log"
+	"net/http"
 
 	"github.com/Leng-Kai/bow-code-API-server/db"
 	"github.com/Leng-Kai/bow-code-API-server/schemas"
+	"github.com/Leng-Kai/bow-code-API-server/session"
 	"github.com/Leng-Kai/bow-code-API-server/util"
 	"github.com/gorilla/mux"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	// "go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -60,10 +61,10 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	// If not, create a new user
 	newUser := schemas.User{
-		UserID: global_uid,
+		UserID:       global_uid,
 		RegisterType: method,
-		UserInfo: userInfo,
-		Super: false,
+		UserInfo:     userInfo,
+		Super:        false,
 	}
 	_, err = db.CreateUser(newUser)
 	if err != nil {
@@ -129,7 +130,43 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		user.UserInfo = userInfo
 	}
 
+	session, err := session.Store.Get(r, "bow-session")
+	if err != nil {
+		log.Print(err)
+	}
+	session.Values["isLogin"] = true
+	session.Values["uid"] = global_uid
+	// Save it before we write to the response/return from the handler.
+	err = session.Save(r, w)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	util.ResponseJSON(w, user)
+}
+
+func AuthSession(w http.ResponseWriter, r *http.Request) {
+	session, err := session.Store.Get(r, "bow-session")
+	if err != nil {
+		log.Print(err)
+	}
+
+	if islogin, ok := session.Values["isLogin"].(bool); ok && islogin {
+		filter := bson.D{{"_id", session.Values["uid"]}}
+		sortby := bson.D{}
+		user, err := db.GetSingleUser(filter, sortby)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, "user not found.", 404)
+			return
+		}
+		util.ResponseJSON(w, user)
+	} else {
+		http.Error(w, "authentication failed.", 401)
+		return
+	}
+
 }
 
 func GetUserByID(w http.ResponseWriter, r *http.Request) {
@@ -145,6 +182,6 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 	util.ResponseJSON(w, user)
 }
 
-func UpdateUserByID(w http.ResponseWriter, r *http.Request){
-	
+func UpdateUserByID(w http.ResponseWriter, r *http.Request) {
+
 }
