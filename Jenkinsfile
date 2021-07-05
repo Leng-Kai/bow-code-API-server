@@ -42,6 +42,7 @@ pipeline {
 
         stage('Healthy Check') {
             steps {
+                sleep(time:3)
                 sh "curl $DEPLOY_URL"
             }
         }
