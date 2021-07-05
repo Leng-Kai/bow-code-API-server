@@ -3,7 +3,6 @@ package course
 import (
 	"bufio"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -32,7 +31,6 @@ func GetAll(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		//handle error
 	}
-	fmt.Print(allCourse)
 	util.ResponseJSON(w, allCourse)
 }
 

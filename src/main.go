@@ -9,7 +9,9 @@ import (
 
 	"github.com/Leng-Kai/bow-code-API-server/db"
 	"github.com/Leng-Kai/bow-code-API-server/routes"
+	"github.com/Leng-Kai/bow-code-API-server/session"
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/rs/cors"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -36,7 +38,14 @@ func main() {
 		log.Fatal(err)
 	}
 	db.InitDB(client)
+	session.InitStore()
 	r := routes.NewRouter()
 	http.Handle("/", r)
-	http.ListenAndServe(":8080", nil)
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000"}, // All origins
+		AllowedMethods:   []string{"GET", "POST"},           // Allowing only get, just an example
+		AllowCredentials: true,
+	})
+
+	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), c.Handler(r)))
 }
