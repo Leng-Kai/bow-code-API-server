@@ -8,6 +8,9 @@ import (
 )
 
 type ID = primitive.ObjectID
+type CourseBlockID = ID
+type CourseID = ID
+type CoursePlanID = ID
 
 type Filter = bson.D
 type Sortby = bson.D

@@ -13,7 +13,12 @@ services:
   api:
     build: 
       context: ./src
+    volumes:
+      - ../content:/data/content
     ports: 
       - 8088:8088
     environment:
       DB_URL: mongodb://root:root@db:27017
+      DOCS_PATH: /data/content
+      PORT: 8088
+      SESSION_KEY: pekora
