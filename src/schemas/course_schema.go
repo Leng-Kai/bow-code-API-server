@@ -29,7 +29,7 @@ type Course struct {
 		Title string `json:"title"`
 		ID    string `json:"id"`
 	} `json:"blockList" bson:"blockList"`
-	Creator    ID        `json:"creator" bson:"creator"`
+	Creator    UserID    `json:"creator" bson:"creator"`
 	Tags       []string  `json:"tags" bson:"tags"`
 	Difficulty int       `json:"difficulty" bson:"difficulty"`
 	IsPublic   bool      `json:"isPublic" bson:"isPublic"`

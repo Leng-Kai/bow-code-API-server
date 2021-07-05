@@ -14,6 +14,7 @@ import (
 
 	"github.com/Leng-Kai/bow-code-API-server/db"
 	"github.com/Leng-Kai/bow-code-API-server/schemas"
+	"github.com/Leng-Kai/bow-code-API-server/user"
 	"github.com/Leng-Kai/bow-code-API-server/util"
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
@@ -45,6 +46,12 @@ func CreateNew(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// http.Error()
 	}
+
+	creator, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+	}
+	newCourse.Creator = creator.UserID
 	newCourse.CreateTime = time.Now()
 	newCourse.Views = 0
 	id, err := db.CreateCourse(newCourse)
