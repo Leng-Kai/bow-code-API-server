@@ -150,6 +150,8 @@ func AuthSession(w http.ResponseWriter, r *http.Request) {
 	session, err := session.Store.Get(r, "bow-session")
 	if err != nil {
 		log.Print(err)
+		http.Error(w, err.Error(), 401)
+		return
 	}
 
 	if islogin, ok := session.Values["isLogin"].(bool); ok && islogin {
@@ -163,7 +165,7 @@ func AuthSession(w http.ResponseWriter, r *http.Request) {
 		}
 		util.ResponseJSON(w, user)
 	} else {
-		http.Error(w, "authentication failed.", 401)
+		util.ResponseJSON(w, schemas.User{})
 		return
 	}
 
