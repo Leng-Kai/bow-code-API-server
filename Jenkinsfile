@@ -38,6 +38,19 @@ pipeline {
                 echo 'Deploying..'
             }
         }
+
+        stage('Healthy Check') {
+            steps {
+                HEALTHY_CHECK = sh (
+                    script: "curl http://localhost:8088/",
+                    returnStatus: true
+                ) == 0
+            }
+            when { not { $HEALTHY_CHECK == "" } }
+            steps {
+                exit
+            }
+        }
     }
     
     post {
