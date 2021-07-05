@@ -31,6 +31,12 @@ func GetSingleUser(filter Filter, sortby Sortby) (User, error) {
 	return result, err
 }
 
+func GetSingleUserByID(id string) (User, error) {
+	filter := bson.D{{"_id", id}}
+	sortby := bson.D{}
+	return GetSingleUser(filter, sortby)
+}
+
 func GetMultipleUsers(filter Filter, sortby Sortby) ([]User, error) {
 	opts := options.Find().SetSort(sortby)
 	var results_bson []bson.M
