@@ -50,6 +50,7 @@ func CreateNew(w http.ResponseWriter, r *http.Request) {
 	creator, err := user.GetSessionUser(r)
 	if err != nil {
 		http.Error(w, err.Error(), 401)
+		return
 	}
 	newCourse.Creator = creator.UserID
 	newCourse.CreateTime = time.Now()

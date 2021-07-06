@@ -14,11 +14,14 @@ func GetSessionUser(r *http.Request) (schemas.User, error) {
 	if err != nil {
 		return schemas.User{}, err
 	}
-	if !session.Values["isLogin"].(bool) {
+	if islogin, ok := session.Values["isLogin"].(bool); !ok || !islogin {
 		return schemas.User{}, errors.New("user not login")
 	}
-	id := session.Values["uid"]
-	user, err := db.GetSingleUserByID(id.(string))
+	id, ok := session.Values["uid"].(string)
+	if !ok {
+		return schemas.User{}, errors.New("invalid id")
+	}
+	user, err := db.GetSingleUserByID(id)
 	if err != nil {
 		return schemas.User{}, errors.New("user not exist")
 	}
