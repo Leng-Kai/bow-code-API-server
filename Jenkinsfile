@@ -4,6 +4,7 @@ pipeline {
     
     environment {
         GITHUB_REPO_URL = "https://github.com/Leng-Kai/bow-code-API-server"
+        DEPLOY_URL = "http://localhost:8088/"
     }
     
     stages {
@@ -36,6 +37,13 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying..'
+            }
+        }
+
+        stage('Healthy Check') {
+            steps {
+                sleep(time:3)
+                sh "curl $DEPLOY_URL"
             }
         }
     }
