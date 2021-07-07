@@ -85,6 +85,90 @@ func GetCourseByID(w http.ResponseWriter, r *http.Request) {
 	util.ResponseJSON(w, course)
 }
 
+func UpdateCourseByID(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	objId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		// invalid id format
+		log.Println(err)
+	}
+	creator, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+
+	filter := bson.D{{"_id", objId}}
+	sortby := bson.D{}
+	course, err := db.GetSingleCourse(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "course not found.", 404)
+		return
+	}
+
+	if course.Creator != creator.UserID {
+		http.Error(w, "permission denied. not course creator.", 401)
+		return
+	}
+
+	body, err := util.GetBody(r)
+	if err != nil {
+		// http.Error()
+	}
+	newCourse := schemas.Course{}
+	err = json.Unmarshal(body, &newCourse)
+	if err != nil {
+		// http.Error()
+	}
+	newCourse.BlockList = course.BlockList // NO BLOCKLIST CHANGE HERE!!
+	err = db.ReplaceCourse(filter, newCourse)
+	if err != nil {
+		http.Error(w, "update failed", 400)
+		return
+	}
+	w.WriteHeader(200)
+}
+
+func RemoveCourseByID(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	objId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		// invalid id format
+		log.Println(err)
+	}
+	creator, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+
+	filter := bson.D{{"_id", objId}}
+	sortby := bson.D{}
+	course, err := db.GetSingleCourse(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "course not found.", 404)
+		return
+	}
+
+	if course.Creator != creator.UserID {
+		http.Error(w, "permission denied. not course creator.", 401)
+		return
+	}
+
+	projection := bson.D{{"_id", 1}}
+	_, err = db.DeleteCourse(filter, projection)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "delete failed", 400)
+		return
+	}
+	util.ResponseJSON(w, course)
+}
+
 func CreateBlock(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	objId, err := primitive.ObjectIDFromHex(id)

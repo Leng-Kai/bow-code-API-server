@@ -85,3 +85,12 @@ func UpdateCourse(filter Filter, update Update, upsert bool) (Course, error) {
 	_ = bson.Unmarshal(bson_marshal, &updated)
 	return updated, err
 }
+
+func ReplaceCourse(filter Filter, replacement Course) error {
+	var updated_bson bson.M
+	err := courses.FindOneAndReplace(context.TODO(), filter, replacement).Decode(&updated_bson)
+	if err != nil {
+		return err
+	}
+	return err
+}
