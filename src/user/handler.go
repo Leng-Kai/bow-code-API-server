@@ -67,9 +67,22 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		Super:        false,
 	}
 	_, err = db.CreateUser(newUser)
+
 	if err != nil {
 		// db error
 	} else {
+		session, err := session.Store.Get(r, "bow-session")
+		if err != nil {
+			log.Print(err)
+		}
+		session.Values["isLogin"] = true
+		session.Values["uid"] = global_uid
+		// Save it before we write to the response/return from the handler.
+		err = session.Save(r, w)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		util.ResponseJSON(w, newUser)
 	}
 }
@@ -111,8 +124,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			// user not exist
-			log.Println("user already exist.")
-			http.Error(w, "user not exist.", 404)
+			util.ResponseJSON(w, schemas.User{})
 			return
 		} else {
 			// db error
