@@ -305,3 +305,52 @@ func UpdateBlock(w http.ResponseWriter, r *http.Request) {
 		// update failed
 	}
 }
+
+func ModifyBlockOrder(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	objId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		// invalid id format
+		log.Println(err)
+	}
+	creator, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+
+	filter := bson.D{{"_id", objId}}
+	sortby := bson.D{}
+	course, err := db.GetSingleCourse(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "course not found.", 404)
+		return
+	}
+
+	if course.Creator != creator.UserID {
+		http.Error(w, "permission denied. not course creator.", 401)
+		return
+	}
+
+	body, err := util.GetBody(r)
+	if err != nil {
+		// http.Error()
+	}
+	newBlockList := []struct {
+		Title string
+		ID    string
+	}{}
+	err = json.Unmarshal(body, &newBlockList)
+	if err != nil {
+		// http.Error()
+	}
+	update := bson.D{{"$set", bson.D{{"blockList", newBlockList}}}}
+	_, err = db.UpdateCourse(filter, update, false)
+	if err != nil {
+		http.Error(w, "update failed", 400)
+		return
+	}
+	w.WriteHeader(200)
+}
