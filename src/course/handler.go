@@ -1,7 +1,7 @@
 package course
 
 import (
-	// "bufio"
+	"bufio"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -9,7 +9,7 @@ import (
 	"os"
 	"path"
 	"strconv"
-	// "strings"
+	"strings"
 	"time"
 
 	"github.com/Leng-Kai/bow-code-API-server/db"
@@ -248,4 +248,36 @@ func GetBlock(w http.ResponseWriter, r *http.Request) {
 		// failed to read file
 	}
 	util.ResponseHTML(w, string(blockContent))
+}
+
+func UpdateBlock(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	bid := mux.Vars(r)["bid"]
+	objId, err := primitive.ObjectIDFromHex(id)
+
+	docsPath := os.Getenv("DOCS_PATH")
+	blockContent, err := util.GetBody(r)
+	if err != nil {
+		// http.Error()
+	}
+
+	blockPath := path.Join(docsPath, "course", id, "block", bid, "index.html")
+
+	err = ioutil.WriteFile(blockPath, blockContent, 0777)
+	if err != nil {
+		// Error to write to file
+		log.Println(err)
+	}
+
+	sc := bufio.NewScanner(strings.NewReader(string(blockContent)))
+	sc.Scan()
+	title := sc.Text()
+
+	filter := bson.D{{"_id", objId}}
+	blockEntry := bson.D{{"title", title}, {"ID", bid}}
+	update := bson.D{{"$push", bson.D{{"blockList", blockEntry}}}}
+	_, err = db.UpdateCourse(filter, update, false)
+	if err != nil {
+		// update failed
+	}
 }
