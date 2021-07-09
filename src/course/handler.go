@@ -254,6 +254,30 @@ func UpdateBlock(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	bid := mux.Vars(r)["bid"]
 	objId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		// invalid id format
+		log.Println(err)
+	}
+
+	creator, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	filter := bson.D{{"_id", objId}}
+	sortby := bson.D{}
+	course, err := db.GetSingleCourse(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "course not found.", 404)
+		return
+	}
+
+	if course.Creator != creator.UserID {
+		http.Error(w, "permission denied. not course creator.", 401)
+		return
+	}
 
 	docsPath := os.Getenv("DOCS_PATH")
 	blockContent, err := util.GetBody(r)
@@ -273,7 +297,7 @@ func UpdateBlock(w http.ResponseWriter, r *http.Request) {
 	sc.Scan()
 	title := sc.Text()
 
-	filter := bson.D{{"_id", objId}}
+	filter = bson.D{{"_id", objId}}
 	blockEntry := bson.D{{"title", title}, {"ID", bid}}
 	update := bson.D{{"$push", bson.D{{"blockList", blockEntry}}}}
 	_, err = db.UpdateCourse(filter, update, false)
