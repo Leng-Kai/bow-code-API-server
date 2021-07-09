@@ -61,10 +61,17 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	// If not, create a new user
 	newUser := schemas.User{
-		UserID:       global_uid,
-		RegisterType: method,
-		UserInfo:     userInfo,
-		Super:        false,
+		UserID:               global_uid,
+		RegisterType:         method,
+		UserInfo:             userInfo,
+		Super:                false,
+		JoinedCourseList:     []schemas.CourseID{},
+		OwnCourseList:        []schemas.CourseID{},
+		FavoriteCourseList:   []schemas.CourseID{},
+		JoinedClassroomList:  []schemas.ClassroomID{},
+		OwnClassroomList:     []schemas.ClassroomID{},
+		JoinedCoursePlanList: []schemas.CoursePlanID{},
+		OwnCoursePlanList:    []schemas.CoursePlanID{},
 	}
 	_, err = db.CreateUser(newUser)
 

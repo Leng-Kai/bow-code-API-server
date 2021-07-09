@@ -64,6 +64,10 @@ func CreateNew(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		//http.Error()
 	} else {
+		_, err := db.UpdateUser(bson.D{{"_id", creator.UserID}}, bson.D{{"$push", bson.D{{"ownCourseList", id}}}}, true)
+		if err != nil {
+			log.Println(err)
+		}
 		resp := struct {
 			CourseID schemas.ID
 		}{CourseID: id}
@@ -88,6 +92,28 @@ func GetCourseByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	util.ResponseJSON(w, course)
+}
+
+func GetMultipleCourses(w http.ResponseWriter, r *http.Request) {
+	params := r.URL.Query()
+	coursesId := []schemas.CourseID{}
+
+	for _, id := range params["courses"] {
+		objId, err := primitive.ObjectIDFromHex(id)
+
+		if err == nil {
+			coursesId = append(coursesId, objId)
+		}
+	}
+	filter := bson.D{{"_id", bson.D{{"$in", coursesId}}}}
+	sortby := bson.D{}
+
+	courses, err := db.GetMultipleCourses(filter, sortby)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	util.ResponseJSON(w, courses)
 }
 
 func UpdateCourseByID(w http.ResponseWriter, r *http.Request) {
@@ -172,6 +198,22 @@ func RemoveCourseByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	util.ResponseJSON(w, course)
+}
+
+func LoveCourseByID(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	objId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		// invalid id format
+		log.Println(err)
+	}
+	user, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+
+	db.UpdateUser(bson.D{{"_id", user.UserID}}, bson.D{{"$push", bson.D{{"favorite_course", objId}}}}, true)
 }
 
 func CreateBlock(w http.ResponseWriter, r *http.Request) {

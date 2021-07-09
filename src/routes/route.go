@@ -24,6 +24,7 @@ func init() {
 	register("GET", "/user/{id}", user.GetUserByID, nil)
 	register("PUT", "/user/{id}", user.UpdateUserByID, nil)
 	/***************** Course *****************/
+	register("GET", "/course/multiple", course.GetMultipleCourses, nil)
 	register("GET", "/course", course.GetAll, nil)
 	register("POST", "/course", course.CreateNew, nil)
 	register("GET", "/course/{id}", course.GetCourseByID, nil)
@@ -31,6 +32,7 @@ func init() {
 	register("DELETE", "/course/{id}", course.RemoveCourseByID, nil)
 	register("POST", "/course/{id}/block", course.CreateBlock, nil)
 	register("GET", "/course/{id}/block/{bid}", course.GetBlock, nil)
+	register("POST", "/course/{id}/favorite", course.LoveCourseByID, nil)
 	/******************************************/
 	register("GET", "/", healthyCheck, nil)
 }
