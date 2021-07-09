@@ -52,13 +52,23 @@ func CreateNew(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 401)
 		return
 	}
+
 	newCourse.Creator = creator.UserID
 	newCourse.CreateTime = time.Now()
 	newCourse.Views = 0
 	id, err := db.CreateCourse(newCourse)
 	if err != nil {
-		//http.Error()
+		// http.Error()
 	} else {
+		docs_path := os.Getenv("DOCS_PATH")
+		log.Println(docs_path)
+		newBlockPath := path.Join(docs_path, "course", id.Hex(), "block")
+		log.Println(newBlockPath)
+		err = os.MkdirAll(newBlockPath, 0755)
+		if err != nil {
+			log.Println(err)
+		}
+
 		resp := struct {
 			CourseID schemas.ID
 		}{CourseID: id}
