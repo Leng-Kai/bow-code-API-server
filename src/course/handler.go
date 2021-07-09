@@ -1,7 +1,7 @@
 package course
 
 import (
-	"bufio"
+	// "bufio"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -9,7 +9,7 @@ import (
 	"os"
 	"path"
 	"strconv"
-	"strings"
+	// "strings"
 	"time"
 
 	"github.com/Leng-Kai/bow-code-API-server/db"
@@ -58,13 +58,12 @@ func CreateNew(w http.ResponseWriter, r *http.Request) {
 	newCourse.Views = 0
 	id, err := db.CreateCourse(newCourse)
 	if err != nil {
+		log.Println(err)
 		// http.Error()
 	} else {
 		docs_path := os.Getenv("DOCS_PATH")
-		log.Println(docs_path)
 		newBlockPath := path.Join(docs_path, "course", id.Hex(), "block")
-		log.Println(newBlockPath)
-		err = os.MkdirAll(newBlockPath, 0755)
+		err = os.MkdirAll(newBlockPath, 0777)
 		if err != nil {
 			log.Println(err)
 		}
@@ -187,21 +186,12 @@ func CreateBlock(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 	docsPath := os.Getenv("DOCS_PATH")
-	blockContent, err := util.GetBody(r)
-	if err != nil {
-		// http.Error()
-	}
+	// blockContent, err := util.GetBody(r)
+	// if err != nil {
+	// 	// http.Error()
+	// }
 
 	files, err := ioutil.ReadDir(path.Join(docsPath, "course", id, "block"))
-	newBlockPath := path.Join(docsPath, "course", id, "block")
-
-	/** Make directory if dir not exist **/
-	if _, err := os.Stat(newBlockPath); os.IsNotExist(err) {
-		err = os.MkdirAll(newBlockPath, 0755)
-		if err != nil {
-			log.Println(err)
-		}
-	}
 
 	/** Retrieve the new block ID **/
 	/** Some error will occur when block ID exceed 99999 **/
@@ -213,16 +203,29 @@ func CreateBlock(w http.ResponseWriter, r *http.Request) {
 		}
 		newBlockID = lastID + 1
 	}
-	newBlockPath = path.Join(newBlockPath, strconv.Itoa(newBlockID))
-	err = ioutil.WriteFile(newBlockPath, blockContent, 0644)
+
+	newBlockPath := path.Join(docsPath, "course", id, "block", strconv.Itoa(newBlockID))
+
+	err = os.MkdirAll(newBlockPath, 0777)
 	if err != nil {
-		// Error to write to file
 		log.Println(err)
 	}
 
-	sc := bufio.NewScanner(strings.NewReader(string(blockContent)))
-	sc.Scan()
-	title := sc.Text()
+	_, err = os.Create(path.Join(newBlockPath, "index.html"))
+	if err != nil {
+		log.Println(err)
+	}
+
+	// err = ioutil.WriteFile(newBlockPath, blockContent, 0644)
+	// if err != nil {
+	// 	// Error to write to file
+	// 	log.Println(err)
+	// }
+
+	// sc := bufio.NewScanner(strings.NewReader(string(blockContent)))
+	// sc.Scan()
+	// title := sc.Text()
+	title := ""
 
 	filter := bson.D{{"_id", objId}}
 	blockEntry := bson.D{{"title", title}, {"ID", strconv.Itoa(newBlockID)}}
@@ -231,7 +234,9 @@ func CreateBlock(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// update failed
 	}
-	w.WriteHeader(200)
+
+	// w.WriteHeader(200)
+	util.ResponseJSON(w, strconv.Itoa(newBlockID))
 }
 
 func GetBlock(w http.ResponseWriter, r *http.Request) {
