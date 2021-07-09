@@ -27,8 +27,13 @@ func init() {
 }
 
 func GetAll(w http.ResponseWriter, r *http.Request) {
+	params := r.URL.Query()
 	filter := bson.D{}
 	sortby := bson.D{}
+
+	for k, v := range params {
+		filter = append(filter, bson.E{k, bson.D{{"$in", v}}})
+	}
 	allCourse, err := db.GetMultipleCourses(filter, sortby)
 	if err != nil {
 		//handle error
