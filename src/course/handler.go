@@ -213,7 +213,11 @@ func LoveCourseByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db.UpdateUser(bson.D{{"_id", user.UserID}}, bson.D{{"$push", bson.D{{"favorite_course", objId}}}}, true)
+	_, err = db.UpdateUser(bson.D{{"_id", user.UserID}}, bson.D{{"$addToSet", bson.D{{"favoriteCourseList", objId}}}}, true)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
 }
 
 func CreateBlock(w http.ResponseWriter, r *http.Request) {
