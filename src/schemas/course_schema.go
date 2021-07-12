@@ -32,6 +32,7 @@ type Course struct {
 	Creator    UserID    `json:"creator" bson:"creator"`
 	Tags       []string  `json:"tags" bson:"tags"`
 	Difficulty int       `json:"difficulty" bson:"difficulty"`
+	Category   string    `json:"category" bson:"category"`
 	IsPublic   bool      `json:"isPublic" bson:"isPublic"`
 	CreateTime time.Time `json:"createTime" bson:"createTime"`
 	Views      int       `json:"views" bson:"views"`

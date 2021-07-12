@@ -28,17 +28,21 @@ func init() {
 
 func GetAll(w http.ResponseWriter, r *http.Request) {
 	params := r.URL.Query()
-	filter := bson.D{}
+	filter := bson.D{{"isPublic", true}}
 	sortby := bson.D{}
 
 	for k, v := range params {
 		filter = append(filter, bson.E{k, bson.D{{"$in", v}}})
 	}
-	allCourse, err := db.GetMultipleCourses(filter, sortby)
+	allCourse, tagsCount, err := db.GetMultipleCourses(filter, sortby)
 	if err != nil {
 		//handle error
 	}
-	util.ResponseJSON(w, allCourse)
+	resp := struct {
+		CourseList []schemas.Course `json:"courseList"`
+		TagsCount  interface{}      `json:"tagsCount"`
+	}{CourseList: allCourse, TagsCount: tagsCount}
+	util.ResponseJSON(w, resp)
 }
 
 func CreateNew(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +55,6 @@ func CreateNew(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// http.Error()
 	}
-
 	creator, err := user.GetSessionUser(r)
 	if err != nil {
 		http.Error(w, err.Error(), 401)
@@ -108,12 +111,16 @@ func GetMultipleCourses(w http.ResponseWriter, r *http.Request) {
 	filter := bson.D{{"_id", bson.D{{"$in", coursesId}}}}
 	sortby := bson.D{}
 
-	courses, err := db.GetMultipleCourses(filter, sortby)
+	courses, tagsCount, err := db.GetMultipleCourses(filter, sortby)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
-	util.ResponseJSON(w, courses)
+	resp := struct {
+		CourseList []schemas.Course `json:"courseList"`
+		TagsCount  interface{}      `json:"tagsCount"`
+	}{CourseList: courses, TagsCount: tagsCount}
+	util.ResponseJSON(w, resp)
 }
 
 func UpdateCourseByID(w http.ResponseWriter, r *http.Request) {
