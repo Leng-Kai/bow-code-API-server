@@ -27,8 +27,13 @@ func init() {
 }
 
 func GetAll(w http.ResponseWriter, r *http.Request) {
+	params := r.URL.Query()
 	filter := bson.D{}
 	sortby := bson.D{}
+
+	for k, v := range params {
+		filter = append(filter, bson.E{k, bson.D{{"$in", v}}})
+	}
 	allCourse, err := db.GetMultipleCourses(filter, sortby)
 	if err != nil {
 		//handle error
@@ -59,6 +64,10 @@ func CreateNew(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		//http.Error()
 	} else {
+		_, err := db.UpdateUser(bson.D{{"_id", creator.UserID}}, bson.D{{"$push", bson.D{{"ownCourseList", id}}}}, true)
+		if err != nil {
+			log.Println(err)
+		}
 		resp := struct {
 			CourseID schemas.ID
 		}{CourseID: id}
@@ -83,6 +92,28 @@ func GetCourseByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	util.ResponseJSON(w, course)
+}
+
+func GetMultipleCourses(w http.ResponseWriter, r *http.Request) {
+	params := r.URL.Query()
+	coursesId := []schemas.CourseID{}
+
+	for _, id := range params["courses"] {
+		objId, err := primitive.ObjectIDFromHex(id)
+
+		if err == nil {
+			coursesId = append(coursesId, objId)
+		}
+	}
+	filter := bson.D{{"_id", bson.D{{"$in", coursesId}}}}
+	sortby := bson.D{}
+
+	courses, err := db.GetMultipleCourses(filter, sortby)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	util.ResponseJSON(w, courses)
 }
 
 func UpdateCourseByID(w http.ResponseWriter, r *http.Request) {
@@ -167,6 +198,26 @@ func RemoveCourseByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	util.ResponseJSON(w, course)
+}
+
+func LoveCourseByID(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	objId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		// invalid id format
+		log.Println(err)
+	}
+	user, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+
+	_, err = db.UpdateUser(bson.D{{"_id", user.UserID}}, bson.D{{"$addToSet", bson.D{{"favoriteCourseList", objId}}}}, true)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
 }
 
 func CreateBlock(w http.ResponseWriter, r *http.Request) {
