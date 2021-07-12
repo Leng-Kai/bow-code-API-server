@@ -14,7 +14,7 @@ services:
     build: 
       context: ./src
     volumes:
-      - ../content:/data/content
+      - /home/bow-code/content:/data/content
     ports: 
       - 8088:8088
     environment:
@@ -22,3 +22,4 @@ services:
       DOCS_PATH: /data/content
       PORT: 8088
       SESSION_KEY: pekora
+      GOOGLE_CLIENT_ID: 125021518011-3omjnghuvlrmv64tb45v380bo0j1iu20.apps.googleusercontent.com
