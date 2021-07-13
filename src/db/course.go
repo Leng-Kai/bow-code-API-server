@@ -6,6 +6,7 @@ import (
 
 	. "github.com/Leng-Kai/bow-code-API-server/schemas"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -31,29 +32,53 @@ func GetSingleCourse(filter Filter, sortby Sortby) (Course, error) {
 	return result, err
 }
 
-func GetMultipleCourses(filter Filter, sortby Sortby) ([]Course, error) {
+func GetMultipleCourses(filter Filter, sortby Sortby) ([]Course, interface{}, error) {
 	opts := options.Find().SetSort(sortby)
 	var results_bson []bson.M
-	var result Course
+	var tags_result_bson []bson.M
+	type tagCntRes struct {
+		Id    string `json:"tag" bson:"_id"`
+		Count int    `json:"count" bson:"count"`
+	}
+	var tags_result tagCntRes
+	var tags_count []tagCntRes
 	var results []Course
 
 	cursor, err := courses.Find(context.TODO(), filter, opts)
 	if err != nil {
-		return results, err
+		return results, tags_count, err
 	}
 
 	err = cursor.All(context.TODO(), &results_bson)
 	if err != nil {
-		return results, err
+		return results, tags_count, err
 	}
-
 	for _, bs := range results_bson {
+		var result Course
 		bson_marshal, _ := bson.Marshal(bs)
 		_ = bson.Unmarshal(bson_marshal, &result)
 		results = append(results, result)
 	}
-
-	return results, err
+	groupStage := mongo.Pipeline{
+		bson.D{{"$match", filter}},
+		bson.D{{"$project", bson.D{{"_id", 1}, {"tags", 1}}}},
+		bson.D{{"$unwind", bson.D{{"path", "$tags"}}}},
+		bson.D{{"$group", bson.D{{"_id", "$tags"}, {"count", bson.D{{"$sum", 1}}}}}},
+	}
+	cursor, err = courses.Aggregate(context.TODO(), groupStage)
+	if err != nil {
+		return results, tags_count, err
+	}
+	err = cursor.All(context.TODO(), &tags_result_bson)
+	if err != nil {
+		return results, tags_count, err
+	}
+	for _, bs := range tags_result_bson {
+		bson_marshal, _ := bson.Marshal(bs)
+		_ = bson.Unmarshal(bson_marshal, &tags_result)
+		tags_count = append(tags_count, tags_result)
+	}
+	return results, tags_count, err
 }
 
 func DeleteCourse(filter Filter, projection Projection) (Course, error) {
