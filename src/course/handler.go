@@ -32,7 +32,12 @@ func GetAll(w http.ResponseWriter, r *http.Request) {
 	sortby := bson.D{}
 
 	for k, v := range params {
-		filter = append(filter, bson.E{k, bson.D{{"$in", v}}})
+		if k == "keyword" {
+			exp := strings.Join(v, "|")
+			filter = append(filter, bson.E{"$or", bson.A{bson.D{{"name", bson.D{{"$regex", exp}}}}, bson.D{{"abstract", bson.D{{"$regex", exp}}}}}})
+		} else {
+			filter = append(filter, bson.E{k, bson.D{{"$in", v}}})
+		}
 	}
 	allCourse, tagsCount, err := db.GetMultipleCourses(filter, sortby)
 	if err != nil {
