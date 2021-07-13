@@ -350,7 +350,7 @@ func UpdateBlock(w http.ResponseWriter, r *http.Request) {
 
 	filter = bson.D{{"_id", objId}}
 	blockEntry := bson.D{{"title", title}, {"ID", bid}}
-	update := bson.D{{"$push", bson.D{{"blockList", blockEntry}}}}
+	update := bson.D{{"$set", bson.D{{"blockList", blockEntry}}}}
 	_, err = db.UpdateCourse(filter, update, false)
 	if err != nil {
 		// update failed
