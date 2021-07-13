@@ -360,9 +360,18 @@ func UpdateBlock(w http.ResponseWriter, r *http.Request) {
 	sc.Scan()
 	title := sc.Text()
 
+	blockList := course.BlockList
+
+	for _, block := range blockList {
+		if block.ID == bid {
+			block.Title = title
+			break
+		}
+	}
+
 	filter = bson.D{{"_id", objId}}
-	blockEntry := bson.D{{"title", title}, {"ID", bid}}
-	update := bson.D{{"$set", bson.D{{"blockList", blockEntry}}}}
+	// blockEntry := bson.D{{"title", title}, {"ID", bid}}
+	update := bson.D{{"$set", bson.D{{"blockList", blockList}}}}
 	_, err = db.UpdateCourse(filter, update, false)
 	if err != nil {
 		// update failed
