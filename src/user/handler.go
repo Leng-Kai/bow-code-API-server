@@ -165,6 +165,25 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	util.ResponseJSON(w, user)
 }
 
+func Logout(w http.ResponseWriter, r *http.Request) {
+	session, err := session.Store.Get(r, "bow-session")
+	if err != nil {
+		log.Print(err)
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	if islogin, ok := session.Values["isLogin"].(bool); ok && islogin {
+		session.Values["isLogin"] = false
+		delete(session.Values, "uid")
+		err = session.Save(r, w)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+	w.WriteHeader(200)
+}
+
 func AuthSession(w http.ResponseWriter, r *http.Request) {
 	session, err := session.Store.Get(r, "bow-session")
 	if err != nil {
@@ -184,6 +203,12 @@ func AuthSession(w http.ResponseWriter, r *http.Request) {
 		}
 		util.ResponseJSON(w, user)
 	} else {
+		session.Values["isLogin"] = false
+		err = session.Save(r, w)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		util.ResponseJSON(w, schemas.User{})
 		return
 	}

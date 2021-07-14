@@ -20,6 +20,7 @@ var routes []Route
 func init() {
 	register("POST", "/register", user.Register, nil)
 	register("POST", "/login", user.Login, nil)
+	register("POST", "/logout", user.Logout, nil)
 	register("GET", "/auth", user.AuthSession, nil)
 	register("GET", "/user/{id}", user.GetUserByID, nil)
 	register("PUT", "/user/{id}", user.UpdateUserByID, nil)
