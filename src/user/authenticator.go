@@ -14,9 +14,9 @@ import (
 type authFunc func(interface{}) (string, UserInfo, error)
 
 var authHandler = map[string]authFunc{
-	"google":	googleAuthenticator,
-	"facebook":	facebookAuthenticator,
-	"twitter": 	twitterAuthenticator,
+	"google":   googleAuthenticator,
+	"facebook": facebookAuthenticator,
+	"twitter":  twitterAuthenticator,
 }
 
 var api_client_id = map[string]string{}
@@ -37,17 +37,12 @@ func googleAuthenticator(token interface{}) (string, UserInfo, error) {
 	if err != nil {
 		return "", UserInfo{}, err
 	}
-	fmt.Print(payload.Claims)
 
 	// some validity checks
 
 	name := payload.Claims["name"].(string)
 	avatar := payload.Claims["picture"].(string)
 	uid := payload.Claims["sub"].(string)
-
-	fmt.Println("name:", name)
-	fmt.Println("avatar:", avatar)
-	fmt.Println("uid:", uid)
 
 	return uid, UserInfo{name, avatar}, nil
 }
