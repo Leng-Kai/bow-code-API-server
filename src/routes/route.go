@@ -31,10 +31,10 @@ func init() {
 	/* Course */
 	register("GET", "/course", course.GetAll, nil)
 	register("POST", "/course", course.CreateNew, nil)
+	register("GET", "/course/multiple", course.GetMultipleCourses, nil)
 	register("GET", "/course/{id}", course.GetCourseByID, nil)
 	register("PUT", "/course/{id}", course.UpdateCourseByID, nil)
 	register("DELETE", "/course/{id}", course.RemoveCourseByID, nil)
-	register("GET", "/course/multiple", course.GetMultipleCourses, nil)
 	register("POST", "/course/{id}/block", course.CreateBlock, nil)
 	register("GET", "/course/{id}/block/{bid}", course.GetBlock, nil)
 	register("PUT", "/course/{id}/block/{bid}", course.UpdateBlock, nil)
@@ -44,16 +44,16 @@ func init() {
 	/* Problem */
 	register("GET", "/problem", problem.GetAllProblems, nil)
 	register("POST", "/problem", problem.CreateNewProblem, nil)
+	register("GET", "/problem/multiple", problem.GetMultipleProblems, nil)
 	register("GET", "/problem/{pid}", problem.GetProblemByID, nil)
 	register("POST", "/problem/{pid}", problem.UpdateProblemByID, nil)
-	register("GET", "/problem/multiple", problem.GetMultipleProblems, nil)
 	
 	/* Submit */
+	register("GET", "/submit/multiple", submit.GetMultipleSubmissions, nil)
 	register("GET", "/submit/{sid}", submit.GetSubmissionByID, nil)
 	register("PUT", "/submit/{sid}", submit.ReceiveJudgeResult, nil)
-	register("GET", "/submit/multiple", submit.GetMultipleSubmissions, nil)
 	register("POST", "/submit/problem/{pid}", submit.SubmitToProblem, nil)
-
+	
 	/* Healthy Check */
 	register("GET", "/", healthyCheck, nil)
 }
