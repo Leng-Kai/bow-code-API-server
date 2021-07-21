@@ -69,6 +69,7 @@ func GetProblemByID(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// invalid id format
 		log.Println(err)
+		return
 	}
 	filter := bson.D{{"_id", objId}}
 	sortby := bson.D{}
