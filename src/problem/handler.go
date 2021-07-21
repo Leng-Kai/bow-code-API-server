@@ -11,7 +11,9 @@ import (
 	"github.com/Leng-Kai/bow-code-API-server/user"
 	"github.com/Leng-Kai/bow-code-API-server/util"
 
+	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func init() {
@@ -62,7 +64,22 @@ func CreateNewProblem(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetProblemByID(w http.ResponseWriter, r *http.Request) {
-
+	id := mux.Vars(r)["pid"]
+	objId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		// invalid id format
+		log.Println(err)
+	}
+	filter := bson.D{{"_id", objId}}
+	sortby := bson.D{}
+	problem, err := db.GetSingleProblem(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "problem not found.", 404)
+		return
+	}
+	util.ResponseJSON(w, problem)
 }
 
 func UpdateProblemByID(w http.ResponseWriter, r *http.Request) {
