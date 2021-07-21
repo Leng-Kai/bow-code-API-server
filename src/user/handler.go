@@ -68,10 +68,12 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		JoinedCourseList:     []schemas.CourseID{},
 		OwnCourseList:        []schemas.CourseID{},
 		FavoriteCourseList:   []schemas.CourseID{},
-		JoinedClassroomList:  []schemas.ClassroomID{},
-		OwnClassroomList:     []schemas.ClassroomID{},
 		JoinedCoursePlanList: []schemas.CoursePlanID{},
 		OwnCoursePlanList:    []schemas.CoursePlanID{},
+		OwnProblemList:	      []schemas.ProblemID{},
+		FavoriteProblemList:  []schemas.ProblemID{},
+		JoinedClassroomList:  []schemas.ClassroomID{},
+		OwnClassroomList:     []schemas.ClassroomID{},
 	}
 	_, err = db.CreateUser(newUser)
 

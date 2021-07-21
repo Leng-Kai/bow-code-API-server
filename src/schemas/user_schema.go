@@ -17,6 +17,8 @@ type User struct {
 	FavoriteCourseList   []CourseID     `json:"favoriteCourseList" bson:"favoriteCourseList"`
 	JoinedCoursePlanList []CoursePlanID `json:"joinedCoursePlanList" bson:"joinedCoursePlanList"`
 	OwnCoursePlanList    []CoursePlanID `json:"ownCoursePlanList" bson:"ownCoursePlanList"`
+	OwnProblemList       []ProblemID    `json:"ownProblemList" bson:"ownProblemList"`
+	FavoriteProblemList  []ProblemID    `json:"favoriteProblemList" bson:"favoriteProblemList"`
 	JoinedClassroomList  []ClassroomID  `json:"joinedClassroomList" bson:"joinedClassroomList"`
 	OwnClassroomList     []ClassroomID  `json:"ownClassroomList" bson:"ownClassroomList"`
 }
