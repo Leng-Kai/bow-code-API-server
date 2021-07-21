@@ -7,11 +7,17 @@ import (
 type SubmissionID = ID
 type SubmissionToken = string
 
+type Judgement struct {
+	TestcaseNo int             `json:"testcaseNo" bson:"testcaseNo"`
+	Token      SubmissionToken `json:"token" bson:"token"`
+}
+
 type Submission struct {
-	SubmissionID ID              `json:"id" bson:"_id,omitempty"`
-	Token        SubmissionToken `json:"token" bson:"token"`
-	Creator      ID              `json:"creator" bson:"creator"`
-	Problem      ID              `json:"problem" bson:"problem"`
-	TestcaseNo   int             `json:"testcaseNo" bson:"testcaseNo"`
-	CreateTime   time.Time       `json:"createTime" bson:"createTime"`
+	SubmissionID       ID          `json:"id" bson:"_id,omitempty"`
+	Creator            ID          `json:"creator" bson:"creator"`
+	Problem            ID          `json:"problem" bson:"problem"`
+	TestcaseCnt        int         `json:"testcaseCnt" bson:"testcaseCnt"`
+	JudgementCompleted int         `json:"judgementCompleted" bson:"judgementCompleted"`
+	Judgements         []Judgement `json:"judgements" bson:"judgements"`
+	CreateTime         time.Time   `json:"createTime" bson:"createTime"`
 }

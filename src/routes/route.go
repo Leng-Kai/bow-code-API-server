@@ -51,7 +51,7 @@ func init() {
 	/* Submit */
 	register("GET", "/submit/multiple", submit.GetMultipleSubmissions, nil)
 	register("GET", "/submit/{sid}", submit.GetSubmissionByID, nil)
-	register("PUT", "/submit/{sid}", submit.ReceiveJudgeResult, nil)
+	register("PUT", "/submit/{sid}/{case}", submit.ReceiveJudgeResult, nil)
 	register("POST", "/submit/problem/{pid}", submit.SubmitToProblem, nil)
 	
 	/* Healthy Check */
