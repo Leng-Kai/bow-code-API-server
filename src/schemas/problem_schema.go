@@ -21,6 +21,7 @@ type Problem struct {
 	Tags           []string  `json:"tags" bson:"tags"`
 	Difficulty     int       `json:"difficulty" bson:"difficulty"`
 	Category       string    `json:"category" bson:"category"`
-	IsPublic       bool      `json:"isPublic" bson:"isPublic"`
+	// IsPublic       bool      `json:"isPublic" bson:"isPublic"`
+	Visibility     int       `json:"visibility" bson:"visibility"`
 	CreateTime     time.Time `json:"createTime" bson:"createTime"`
 }
