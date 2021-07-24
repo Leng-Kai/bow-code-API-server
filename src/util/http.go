@@ -21,7 +21,7 @@ func GetBody(r *http.Request) ([]byte, error) {
 }
 
 func SendHTTPRequest(method string, url string, body []byte) error {
-	request, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
+	request, err := http.NewRequest(method, url, bytes.NewBuffer(body))
 	request.Header.Set("Content-Type", "application/json; charset=UTF-8")
 
 	client := &http.Client{}
