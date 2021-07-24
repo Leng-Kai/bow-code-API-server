@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/Leng-Kai/bow-code-API-server/db"
@@ -25,7 +26,38 @@ func GetSubmissionByID(w http.ResponseWriter, r *http.Request) {
 }
 
 func ReceiveJudgeResult(w http.ResponseWriter, r *http.Request) {
+	sid, err := primitive.ObjectIDFromHex(mux.Vars(r)["sid"])
+	if err != nil {
+		// invalid sid format
+		log.Println(err)
+		return
+	}
+	caseNo, err := strconv.Atoi(mux.Vars(r)["caseNo"])
+	if err != nil {
+		// invalid case format
+		log.Println(err)
+		return
+	}
 
+	log.Println(sid)
+	log.Println(caseNo)
+	
+	body, err := util.GetBody(r)
+	result := schemas.Result{}
+	_ = json.Unmarshal(body, &result)
+
+	log.Println(result)
+
+	newJudgement := schemas.Judgement{
+		TestcaseNo: caseNo, Token: result.Token, Status: result.Status.ID,
+	}
+
+	filter := bson.D{{"_id", sid}}
+	update := bson.D{{"$push", bson.D{{"judgements", newJudgement}}}}
+	_, err = db.UpdateSubmission(filter, update, false)
+
+	update = bson.D{{"$inc", bson.D{{"judgementCompleted", 1}}}}
+	_, err = db.UpdateSubmission(filter, update, false)
 }
 
 func GetMultipleSubmissions(w http.ResponseWriter, r *http.Request) {
@@ -72,7 +104,7 @@ func SubmitToProblem(w http.ResponseWriter, r *http.Request) {
 		// http.Error()
 		return
 	}
-	log.Println(userSubmission)
+	// log.Println(userSubmission)
 
 	err = SendJudgeRequests(problem, userSubmission)
 	if err != nil {
