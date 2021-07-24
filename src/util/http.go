@@ -18,3 +18,8 @@ func ResponseHTML(w http.ResponseWriter, html string) {
 func GetBody(r *http.Request) ([]byte, error) {
 	return ioutil.ReadAll(r.Body)
 }
+
+func SendHTTPRequest(url string, body interface{}) error {
+	var err error
+	return err
+}

@@ -106,7 +106,7 @@ func SubmitToProblem(w http.ResponseWriter, r *http.Request) {
 	}
 	// log.Println(userSubmission)
 
-	err = SendJudgeRequests(problem, userSubmission)
+	err = SendJudgeRequests(problem, userSubmission, sid)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), 404)
