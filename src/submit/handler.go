@@ -22,7 +22,23 @@ func init() {
 }
 
 func GetSubmissionByID(w http.ResponseWriter, r *http.Request) {
-
+	id := mux.Vars(r)["sid"]
+	objId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		// invalid id format
+		log.Println(err)
+		return
+	}
+	filter := bson.D{{"_id", objId}}
+	sortby := bson.D{}
+	problem, err := db.GetSingleSubmission(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "submission not found.", 404)
+		return
+	}
+	util.ResponseJSON(w, problem)
 }
 
 func ReceiveJudgeResult(w http.ResponseWriter, r *http.Request) {
