@@ -2,8 +2,8 @@ package submit
 
 import (
 	"fmt"
+	"encoding/json"
 	"os"
-	// "net/http"
 
 	. "github.com/Leng-Kai/bow-code-API-server/schemas"
 	"github.com/Leng-Kai/bow-code-API-server/util"
@@ -12,11 +12,11 @@ import (
 )
 
 type judgeRequest struct {
-	source_code     string `json:"source_code"`
-	language_id     int    `json:"language_id"`
-	stdin           string `json:"stdin"`
-	expected_output string `json:"expected_output"`
-	callback_url    string `json:"callback_url"`
+	Source_code     string `json:"source_code"`
+	Language_id     int    `json:"language_id"`
+	Stdin           string `json:"stdin"`
+	Expected_output string `json:"expected_output"`
+	Callback_url    string `json:"callback_url"`
 }
 
 func init() {
@@ -35,14 +35,15 @@ func SendJudgeRequests(problem Problem, us UserSubmission, sid SubmissionID) err
 	for i, _ := range inputs {
 		stdin := inputs[i]
 		expected_output := outputs[i]
-		callback_url := fmt.Sprintf("%s/submit/%s/%d", self_url, sid, i)
+		callback_url := fmt.Sprintf("%s/submit/%s/%d", self_url, sid.Hex(), i)
 
-		url := os.Getenv("JUDGE0_URL")
+		url := fmt.Sprintf("%s/%s", os.Getenv("JUDGE0_URL"), "submissions")
 		body := judgeRequest{
 			source_code, language_id, stdin, expected_output, callback_url,
 		}
 
-		err = util.SendHTTPRequest(url, body)
+		jsonData, _ := json.Marshal(body)
+		err = util.SendHTTPRequest("POST", url, jsonData)
 		if err != nil {
 			break
 		}

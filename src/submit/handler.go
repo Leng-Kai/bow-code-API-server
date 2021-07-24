@@ -38,15 +38,10 @@ func ReceiveJudgeResult(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-
-	log.Println(sid)
-	log.Println(caseNo)
 	
 	body, err := util.GetBody(r)
 	result := schemas.Result{}
 	_ = json.Unmarshal(body, &result)
-
-	log.Println(result)
 
 	newJudgement := schemas.Judgement{
 		TestcaseNo: caseNo, Token: result.Token, Status: result.Status.ID,

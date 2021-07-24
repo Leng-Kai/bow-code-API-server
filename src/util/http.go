@@ -1,6 +1,7 @@
 package util
 
 import (
+	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -19,7 +20,17 @@ func GetBody(r *http.Request) ([]byte, error) {
 	return ioutil.ReadAll(r.Body)
 }
 
-func SendHTTPRequest(url string, body interface{}) error {
-	var err error
+func SendHTTPRequest(method string, url string, body []byte) error {
+	request, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
+	request.Header.Set("Content-Type", "application/json; charset=UTF-8")
+
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		panic(err)
+		return err
+	}
+	defer response.Body.Close()
+
 	return err
 }
