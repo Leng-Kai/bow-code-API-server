@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Leng-Kai/bow-code-API-server/db"
@@ -88,5 +90,47 @@ func UpdateProblemByID(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetMultipleProblems(w http.ResponseWriter, r *http.Request) {
+	param_tags := r.URL.Query().Get("tag")
+	param_difficulties := r.URL.Query().Get("difficulty")
+	filter_tags := bson.D{}
+	filter_difficulties := bson.D{}
 
+	if len(param_tags) > 0 {
+		tags := strings.Split(param_tags, ",")
+		filter_tags = bson.D{{
+			"tags", bson.D{{
+				"$elemMatch", bson.D{{
+					"$in", tags,
+				}},
+			}},
+		}}
+	}
+	if len(param_difficulties) > 0 {
+		difficulties_string := strings.Split(param_difficulties, ",")
+		difficulties := []int{}
+		for _, difficulty_string := range difficulties_string {
+			difficulty, _ := strconv.Atoi(difficulty_string)
+			difficulties = append(difficulties, difficulty)
+		}
+		filter_difficulties = bson.D{{
+			"difficulty", bson.D{{
+				"$in", difficulties,
+			}},
+		}}
+	}
+
+	filter := bson.D{{"$and", []bson.D{
+		filter_tags,
+		filter_difficulties,
+	}}}
+	sortby := bson.D{}
+	problems, err := db.GetMultipleProblems(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, err.Error(), 404)
+		return
+	}
+
+	util.ResponseJSON(w, problems)
 }
