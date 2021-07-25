@@ -32,6 +32,29 @@ func GetSingleProblem(filter Filter, sortby Sortby) (Problem, error) {
 	return result, err
 }
 
+func GetMultipleProblems(filter Filter, sortby Sortby) ([]Problem, error) {
+	opts := options.Find().SetSort(sortby)
+	var results_bson []bson.M
+	var results []Problem
+
+	cursor, err := problems.Find(context.TODO(), filter, opts)
+	if err != nil {
+		return results, err
+	}
+
+	if err = cursor.All(context.TODO(), &results_bson); err != nil {
+		return results, err
+	}
+	for _, result_bson := range results_bson {
+		var result Problem
+		bson_marshal, _ := bson.Marshal(result_bson)
+		_ = bson.Unmarshal(bson_marshal, &result)
+		results = append(results, result)
+	}
+
+	return results, err
+}
+
 func DeleteProblem(filter Filter, projection Projection) (Problem, error) {
 	opts := options.FindOneAndDelete().SetProjection(projection)
 	var deleted_bson bson.M
