@@ -42,9 +42,9 @@ func init() {
 	register("POST", "/course/{id}/favorite", course.LoveCourseByID, nil)
 
 	/* Problem */
-	register("GET", "/problem", problem.GetAllProblems, nil)
+	register("GET", "/problem", problem.GetProblems, nil)
 	register("POST", "/problem", problem.CreateNewProblem, nil)
-	register("GET", "/problem/multiple", problem.GetMultipleProblems, nil)
+	// register("GET", "/problem/multiple", problem.GetMultipleProblems, nil)
 	register("GET", "/problem/{pid}", problem.GetProblemByID, nil)
 	register("POST", "/problem/{pid}", problem.UpdateProblemByID, nil)
 	

@@ -89,7 +89,7 @@ func UpdateProblemByID(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func GetMultipleProblems(w http.ResponseWriter, r *http.Request) {
+func GetProblems(w http.ResponseWriter, r *http.Request) {
 	param_tags := r.URL.Query().Get("tag")
 	param_difficulties := r.URL.Query().Get("difficulty")
 	filter_tags := bson.D{}
