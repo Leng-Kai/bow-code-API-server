@@ -25,7 +25,7 @@ type Submission struct {
 	TestcaseCnt        int         `json:"testcaseCnt" bson:"testcaseCnt"`
 	JudgementCompleted int         `json:"judgementCompleted" bson:"judgementCompleted"`
 	Judgements         []Judgement `json:"judgements" bson:"judgements"`
-	Status             int         `json:"status" bson:"status"`
+	Status             uint        `json:"status" bson:"status"`
 	CreateTime         time.Time   `json:"createTime" bson:"createTime"`
 }
 

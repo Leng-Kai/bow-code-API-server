@@ -89,6 +89,9 @@ func ReceiveJudgeResult(w http.ResponseWriter, r *http.Request) {
 
 	update = bson.D{{"$inc", bson.D{{"judgementCompleted", 1}}}}
 	_, err = db.UpdateSubmission(filter, update, false)
+
+	update = bson.D{{"$bit", bson.D{{"status", bson.D{{"or", Status2Flag[result.Status.ID]}}}}}}
+	_, err = db.UpdateSubmission(filter, update, false)
 }
 
 func GetMultipleSubmissions(w http.ResponseWriter, r *http.Request) {
