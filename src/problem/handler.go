@@ -132,5 +132,27 @@ func GetProblems(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	util.ResponseJSON(w, problems)
+	tagsCounter := map[string]int{}
+	for _, problem := range problems {
+		for _, tag := range problem.Tags {
+			_, map_exist := tagsCounter[tag]
+			if !map_exist {
+				tagsCounter[tag] = 0
+			}
+			tagsCounter[tag] += 1
+		}
+	}
+
+	tagsCount := []schemas.TagCount{}
+
+	for tag, count := range tagsCounter {
+		tagCount := schemas.TagCount{tag, count}
+		tagsCount = append(tagsCount, tagCount)
+	}
+
+	resp := struct {
+		ProblemList []schemas.Problem  `json:"problemList" bson:"problemList"`
+		TagsCount   []schemas.TagCount `json:"tagsCount" bson:"tagsCount"`
+	}{problems, tagsCount}
+	util.ResponseJSON(w, resp)
 }

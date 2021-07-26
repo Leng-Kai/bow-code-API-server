@@ -22,6 +22,11 @@ type Problem struct {
 	Difficulty     int       `json:"difficulty" bson:"difficulty"`
 	Category       string    `json:"category" bson:"category"`
 	// IsPublic       bool      `json:"isPublic" bson:"isPublic"`
-	Visibility     int       `json:"visibility" bson:"visibility"`
-	CreateTime     time.Time `json:"createTime" bson:"createTime"`
+	Visibility int       `json:"visibility" bson:"visibility"`
+	CreateTime time.Time `json:"createTime" bson:"createTime"`
+}
+
+type TagCount struct {
+	Tag   string `json:"tag" bson:"tag"`
+	Count int    `json:"count" bson:"count"`
 }
