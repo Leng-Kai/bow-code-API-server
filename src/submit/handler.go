@@ -50,7 +50,7 @@ func GetSubmissionsByUID(w http.ResponseWriter, r *http.Request) {
 
 	uid := user.UserID
 	filter := bson.D{{"creator", uid}}
-	sortby := bson.D{}
+	sortby := bson.D{{"createTime", -1}}
 	submissions, err := db.GetMultipleSubmissions(filter, sortby)
 	if err != nil {
 		// db error
