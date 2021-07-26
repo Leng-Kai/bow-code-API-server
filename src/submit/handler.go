@@ -41,6 +41,26 @@ func GetSubmissionByID(w http.ResponseWriter, r *http.Request) {
 	util.ResponseJSON(w, problem)
 }
 
+func GetSubmissionsByUID(w http.ResponseWriter, r *http.Request) {
+	user, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+
+	uid := user.UserID
+	filter := bson.D{{"creator", uid}}
+	sortby := bson.D{}
+	submissions, err := db.GetMultipleSubmissions(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, err.Error(), 404)
+		return
+	}
+	util.ResponseJSON(w, submissions)
+}
+
 func ReceiveJudgeResult(w http.ResponseWriter, r *http.Request) {
 	sid, err := primitive.ObjectIDFromHex(mux.Vars(r)["sid"])
 	if err != nil {
