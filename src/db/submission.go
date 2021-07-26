@@ -32,6 +32,29 @@ func GetSingleSubmission(filter Filter, sortby Sortby) (Submission, error) {
 	return result, err
 }
 
+func GetMultipleSubmissions(filter Filter, sortby Sortby) ([]Submission, error) {
+	opts := options.Find().SetSort(sortby)
+	var results_bson []bson.M
+	var results []Submission
+
+	cursor, err := submissions.Find(context.TODO(), filter, opts)
+	if err != nil {
+		return results, err
+	}
+
+	if err = cursor.All(context.TODO(), &results_bson); err != nil {
+		return results, err
+	}
+	for _, result_bson := range results_bson {
+		var result Submission
+		bson_marshal, _ := bson.Marshal(result_bson)
+		_ = bson.Unmarshal(bson_marshal, &result)
+		results = append(results, result)
+	}
+
+	return results, err
+}
+
 func DeleteSubmission(filter Filter, projection Projection) (Submission, error) {
 	opts := options.FindOneAndDelete().SetProjection(projection)
 	var deleted_bson bson.M
