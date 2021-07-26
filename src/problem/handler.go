@@ -97,11 +97,16 @@ func GetProblems(w http.ResponseWriter, r *http.Request) {
 
 	if len(param_tags) > 0 {
 		tags := strings.Split(param_tags, ",")
+		// filter_tags = bson.D{{
+		// 	"tags", bson.D{{
+		// 		"$elemMatch", bson.D{{
+		// 			"$in", tags,
+		// 		}},
+		// 	}},
+		// }}
 		filter_tags = bson.D{{
 			"tags", bson.D{{
-				"$elemMatch", bson.D{{
-					"$in", tags,
-				}},
+				"$all", tags,
 			}},
 		}}
 	}
