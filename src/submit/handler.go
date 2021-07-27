@@ -138,8 +138,8 @@ func SubmitToProblem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	newSubmission := schemas.Submission{
-		Creator: creator.UserID, Problem: problem.ProblemID, TestcaseCnt: problem.Testcase.TestcaseCnt,
-		JudgementCompleted: 0, Judgements: []schemas.Judgement{}, CreateTime: time.Now(),
+		Creator: creator.UserID, Problem: problem.ProblemID, ProblemName: problem.Name, ProblemCategory: problem.Category,
+		TestcaseCnt: problem.Testcase.TestcaseCnt, JudgementCompleted: 0, Judgements: []schemas.Judgement{}, CreateTime: time.Now(),
 	}
 
 	sid, err := db.CreateSubmission(newSubmission)

@@ -22,6 +22,8 @@ type Submission struct {
 	SubmissionID       ID          `json:"id" bson:"_id,omitempty"`
 	Creator            UserID      `json:"creator" bson:"creator"`
 	Problem            ID          `json:"problem" bson:"problem"`
+	ProblemName		   string	   `json:"problemName" bson:"problemName"`
+	ProblemCategory	   string	   `json:"problemCategory" bson:"problemCategory"`
 	TestcaseCnt        int         `json:"testcaseCnt" bson:"testcaseCnt"`
 	JudgementCompleted int         `json:"judgementCompleted" bson:"judgementCompleted"`
 	Judgements         []Judgement `json:"judgements" bson:"judgements"`
