@@ -51,6 +51,22 @@ func GetSubmissionsByUID(w http.ResponseWriter, r *http.Request) {
 	uid := user.UserID
 	filter := bson.D{{"creator", uid}}
 	sortby := bson.D{{"createTime", -1}}
+
+	pid_hex := r.URL.Query().Get("pid")
+	if len(pid_hex) > 0 {
+		// log.Println(pid_hex)
+		pid, err := primitive.ObjectIDFromHex(pid_hex)
+		if err != nil {
+			// invalid id format
+			log.Println(err)
+		} else {
+			filter = bson.D{{"$and", []bson.D{
+				bson.D{{"creator", uid}},
+				bson.D{{"problem", pid}},
+			}}}
+		}
+	}
+
 	submissions, err := db.GetMultipleSubmissions(filter, sortby)
 	if err != nil {
 		// db error
