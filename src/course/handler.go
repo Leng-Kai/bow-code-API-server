@@ -391,6 +391,76 @@ func UpdateBlock(w http.ResponseWriter, r *http.Request) {
 	// }
 }
 
+func UpdateBlockTitle(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	bid := mux.Vars(r)["bid"]
+	objId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		// invalid id format
+		log.Println(err)
+	}
+
+	creator, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	filter := bson.D{{"_id", objId}}
+	sortby := bson.D{}
+	course, err := db.GetSingleCourse(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "course not found.", 404)
+		return
+	}
+
+	if course.Creator != creator.UserID {
+		http.Error(w, "permission denied. not course creator.", 401)
+		return
+	}
+
+	body, err := util.GetBody(r)
+	if err != nil {
+		// http.Error()
+	}
+	titleWrapper := struct {
+		Title string `json:"title"`
+	}{}
+	err = json.Unmarshal(body, &titleWrapper)
+	if err != nil {
+		// http.Error()
+		return
+	}
+
+	title := titleWrapper.Title
+	log.Println(title)
+	
+	blockList := course.BlockList
+	log.Println(blockList)
+
+	for i, block := range blockList {
+		if block.ID == bid {
+			log.Println(bid)
+			blockList[i].Title = title
+			break
+		}
+	}
+
+	log.Println(blockList)
+
+	filter = bson.D{{"_id", objId}}
+	// blockEntry := bson.D{{"title", title}, {"ID", bid}}
+	update := bson.D{{"$set", bson.D{{"blockList", blockList}}}}
+	_, err = db.UpdateCourse(filter, update, false)
+	if err != nil {
+		// update failed
+		log.Println(err)
+	}
+
+	w.WriteHeader(200)
+}
+
 func ModifyBlockOrder(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	objId, err := primitive.ObjectIDFromHex(id)
