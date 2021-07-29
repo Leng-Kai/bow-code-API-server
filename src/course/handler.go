@@ -434,20 +434,15 @@ func UpdateBlockTitle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	title := titleWrapper.Title
-	log.Println(title)
 	
 	blockList := course.BlockList
-	log.Println(blockList)
 
 	for i, block := range blockList {
 		if block.ID == bid {
-			log.Println(bid)
 			blockList[i].Title = title
 			break
 		}
 	}
-
-	log.Println(blockList)
 
 	filter = bson.D{{"_id", objId}}
 	// blockEntry := bson.D{{"title", title}, {"ID", bid}}
@@ -456,6 +451,8 @@ func UpdateBlockTitle(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// update failed
 		log.Println(err)
+		http.Error(w, err.Error(), 404)
+		return
 	}
 
 	w.WriteHeader(200)
