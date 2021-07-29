@@ -1,7 +1,7 @@
 package course
 
 import (
-	"bufio"
+	// "bufio"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -288,8 +288,21 @@ func CreateBlock(w http.ResponseWriter, r *http.Request) {
 	// sc := bufio.NewScanner(strings.NewReader(string(blockContent)))
 	// sc.Scan()
 	// title := sc.Text()
-	title := ""
 
+	body, err := util.GetBody(r)
+	if err != nil {
+		// http.Error()
+	}
+	titleWrapper := struct {
+		Title string `json:"title"`
+	}{}
+	err = json.Unmarshal(body, &titleWrapper)
+	if err != nil {
+		// http.Error()
+		return
+	}
+
+	title := titleWrapper.Title
 	filter := bson.D{{"_id", objId}}
 	blockEntry := bson.D{{"title", title}, {"ID", strconv.Itoa(newBlockID)}}
 	update := bson.D{{"$push", bson.D{{"blockList", blockEntry}}}}
@@ -356,26 +369,26 @@ func UpdateBlock(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
-	sc := bufio.NewScanner(strings.NewReader(string(blockContent)))
-	sc.Scan()
-	title := sc.Text()
+	// sc := bufio.NewScanner(strings.NewReader(string(blockContent)))
+	// sc.Scan()
+	// title := sc.Text()
 
-	blockList := course.BlockList
+	// blockList := course.BlockList
 
-	for _, block := range blockList {
-		if block.ID == bid {
-			block.Title = title
-			break
-		}
-	}
+	// for _, block := range blockList {
+	// 	if block.ID == bid {
+	// 		block.Title = title
+	// 		break
+	// 	}
+	// }
 
-	filter = bson.D{{"_id", objId}}
-	// blockEntry := bson.D{{"title", title}, {"ID", bid}}
-	update := bson.D{{"$set", bson.D{{"blockList", blockList}}}}
-	_, err = db.UpdateCourse(filter, update, false)
-	if err != nil {
-		// update failed
-	}
+	// filter = bson.D{{"_id", objId}}
+	// // blockEntry := bson.D{{"title", title}, {"ID", bid}}
+	// update := bson.D{{"$set", bson.D{{"blockList", blockList}}}}
+	// _, err = db.UpdateCourse(filter, update, false)
+	// if err != nil {
+	// 	// update failed
+	// }
 }
 
 func ModifyBlockOrder(w http.ResponseWriter, r *http.Request) {
