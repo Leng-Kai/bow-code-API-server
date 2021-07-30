@@ -26,6 +26,7 @@ type Course struct {
 	Name      string `json:"name" bson:"name"`
 	Abstract  string `json:"abstract" bson:"abstract"`
 	BlockList []struct {
+		Type  string `json:"type"`
 		Title string `json:"title"`
 		ID    string `json:"id"`
 	} `json:"blockList" bson:"blockList"`
