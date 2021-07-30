@@ -42,7 +42,18 @@ func main() {
 	r := routes.NewRouter()
 	http.Handle("/", r)
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:3001", "http://api.ramen-live.com:3000", "http://api.ramen-live.com:3001"}, // All origins
+		AllowedOrigins:   []string{
+			"http://localhost:3000", 
+			"http://localhost:3001", 
+			"http://localhost:3002", 
+			"http://localhost:3003", 
+			"http://localhost:3004", 
+			"http://api.ramen-live.com:3000", 
+			"http://api.ramen-live.com:3001",
+			"http://api.ramen-live.com:3002",
+			"http://api.ramen-live.com:3003",
+			"http://api.ramen-live.com:3004",
+		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},                                                                                       // Allowing only get, just an example
 		AllowCredentials: true,
 	})
