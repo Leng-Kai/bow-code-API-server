@@ -46,8 +46,8 @@ func init() {
 	/* CoursePlan */
 	register("GET", "/course_plan", course_plan.GetCoursePlans, nil)
 	register("POST", "/course_plan", course_plan.CreateNewCoursePlan, nil)
-	register("GET", "/course_plan/{id}", course_plan.GetCoursePlanByID, nil)
-	register("POST", "/course_plan/{id}", course_plan.UpdateCoursePlanByID, nil)
+	register("GET", "/course_plan/{cpid}", course_plan.GetCoursePlanByID, nil)
+	register("POST", "/course_plan/{cpid}", course_plan.UpdateCoursePlanByID, nil)
 
 	/* Problem */
 	register("GET", "/problem", problem.GetProblems, nil)
@@ -62,6 +62,17 @@ func init() {
 	register("GET", "/submit/{sid}", submit.GetSubmissionByID, nil)
 	register("PUT", "/submit/{sid}/{caseNo}", submit.ReceiveJudgeResult, nil)
 	register("POST", "/submit/problem/{pid}", submit.SubmitToProblem, nil)
+
+	/* Classroom */
+	register("GET", "/classroom", classroom.GetClassrooms, nil)
+	register("POST", "/classroom", classroom.CreateNewClassroom, nil)
+	register("POST", "/classroom/apply/{crid}", classroom.ApplyForClassroom, nil) 
+	register("POST", "/classroom/accept/{crid}/{uid}", classroom.AcceptApplication, nil)
+	register("POST", "/classroom/invite/{crid}/{uid}", classroom.InviteStudent, nil)
+	register("POST", "/classroom/join/{crid}", classroom.JoinClassroom, nil)
+	register("GET", "/classroom/status/{crid}", classroom.GetClassroomStatus, nil)
+	register("GET", "/classroom/{crid}", classroom.GetClassroomByID, nil)
+	register("POST", "/classroom/{crid}", classroom.UpdateClassroomByID, nil)
 	
 	/* Healthy Check */
 	register("GET", "/", healthyCheck, nil)
