@@ -10,7 +10,6 @@ import (
 type ID = primitive.ObjectID
 type CourseBlockID = ID
 type CourseID = ID
-type CoursePlanID = ID
 
 type Filter = bson.D
 type Sortby = bson.D
@@ -37,8 +36,4 @@ type Course struct {
 	IsPublic   bool      `json:"isPublic" bson:"isPublic"`
 	CreateTime time.Time `json:"createTime" bson:"createTime"`
 	Views      int       `json:"views" bson:"views"`
-}
-
-type CoursePlan struct {
-	CoursePlanID ID `json:"_id,omitempty"`
 }
