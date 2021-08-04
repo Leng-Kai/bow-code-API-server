@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/Leng-Kai/bow-code-API-server/course"
+	"github.com/Leng-Kai/bow-code-API-server/course_plan"
 	"github.com/Leng-Kai/bow-code-API-server/user"
 	"github.com/Leng-Kai/bow-code-API-server/problem"
 	"github.com/Leng-Kai/bow-code-API-server/submit"
@@ -41,6 +42,12 @@ func init() {
 	register("PUT", "/course/{id}/block/{bid}", course.UpdateBlock, nil)
 	register("PUT", "/course/{id}/blockOrder", course.ModifyBlockOrder, nil)
 	register("POST", "/course/{id}/favorite", course.LoveCourseByID, nil)
+
+	/* CoursePlan */
+	register("GET", "/course_plan", course_plan.GetCoursePlans, nil)
+	register("POST", "/course_plan", course_plan.CreateNewCoursePlan, nil)
+	register("GET", "/course_plan/{id}", course_plan.GetCoursePlanByID, nil)
+	register("POST", "/course_plan/{id}", course_plan.UpdateCoursePlanByID, nil)
 
 	/* Problem */
 	register("GET", "/problem", problem.GetProblems, nil)
