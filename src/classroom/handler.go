@@ -46,6 +46,9 @@ func CreateNewClassroom(w http.ResponseWriter, r *http.Request) {
 
 	newClassroom.Creator = creator.UserID
 	newClassroom.CreateTime = time.Now()
+	newClassroom.Students = []schemas.UserID{}
+	newClassroom.Applicants = []schemas.UserID{}
+	newClassroom.Invitees = []schemas.UserID{}
 	id, err := db.CreateClassroom(newClassroom)
 	if err != nil {
 		log.Println(err)
