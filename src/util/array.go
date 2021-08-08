@@ -1,10 +1,10 @@
 package util
 
-func Contain(array []interface{}, item interface{}) int {
+func Contain(array []interface{}, item interface{}) bool {
 	for i, ele := range array {
 		if ele == item {
-			return i
+			return true
 		}
 	}
-	return -1
+	return false
 }
