@@ -74,6 +74,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		FavoriteProblemList:  []schemas.ProblemID{},
 		JoinedClassroomList:  []schemas.ClassroomID{},
 		OwnClassroomList:     []schemas.ClassroomID{},
+		AppliedClassroomList: []schemas.ClassroomID{},
 	}
 	_, err = db.CreateUser(newUser)
 

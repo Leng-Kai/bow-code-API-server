@@ -69,7 +69,70 @@ func CreateNewClassroom(w http.ResponseWriter, r *http.Request) {
 }
 
 func ApplyForClassroom(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["crid"]
+	crid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		// invalid id format
+		log.Println(err)
+		return
+	}
+	filter := bson.D{{"_id", crid}}
+	sortby := bson.D{}
+	classroom, err := db.GetSingleClassroom(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "classroom not found.", 404)
+		return
+	}
 
+	user_obj, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+
+	uid := user_obj.UserID
+	update := bson.D{}
+
+	if !classroom.Apply {
+		http.Error(w, "classroom not available.", 404)
+		return
+	} else if classroom.Review {
+		filter = bson.D{{"_id", uid}}
+		update = bson.D{{"$push", bson.D{{"appliedClassroomList", crid}}}}
+		_, err = db.UpdateUser(filter, update, false)
+		if err != nil {
+			http.Error(w, err.Error(), 404)
+			return
+		}
+
+		filter = bson.D{{"_id", crid}}
+		update = bson.D{{"$push", bson.D{{"applicants", uid}}}}
+		_, err = db.UpdateClassroom(filter, update, false)
+		if err != nil {
+			http.Error(w, err.Error(), 404)
+			return
+		}
+	} else {
+		filter = bson.D{{"_id", uid}}
+		update = bson.D{{"$push", bson.D{{"joinedClassroomList", crid}}}}
+		_, err = db.UpdateUser(filter, update, false)
+		if err != nil {
+			http.Error(w, err.Error(), 404)
+			return
+		}
+
+		filter = bson.D{{"_id", crid}}
+		update = bson.D{{"$push", bson.D{{"students", uid}}}}
+		_, err = db.UpdateClassroom(filter, update, false)
+		if err != nil {
+			http.Error(w, err.Error(), 404)
+			return
+		}
+	}
+
+	w.WriteHeader(200)
 }
 
 func AcceptApplication(w http.ResponseWriter, r *http.Request) {

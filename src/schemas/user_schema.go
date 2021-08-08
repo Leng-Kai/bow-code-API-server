@@ -12,13 +12,18 @@ type User struct {
 	RegisterType         string `json:"registerType" bson:"registerType"`
 	UserInfo             `json:"userInfo" bson:"userInfo"`
 	Super                bool           `json:"super" bson:"super"`
+
 	JoinedCourseList     []CourseID     `json:"joinedCourseList" bson:"joinedCourseList"`
 	OwnCourseList        []CourseID     `json:"ownCourseList" bson:"ownCourseList"`
 	FavoriteCourseList   []CourseID     `json:"favoriteCourseList" bson:"favoriteCourseList"`
+
 	JoinedCoursePlanList []CoursePlanID `json:"joinedCoursePlanList" bson:"joinedCoursePlanList"`
 	OwnCoursePlanList    []CoursePlanID `json:"ownCoursePlanList" bson:"ownCoursePlanList"`
+
 	OwnProblemList       []ProblemID    `json:"ownProblemList" bson:"ownProblemList"`
 	FavoriteProblemList  []ProblemID    `json:"favoriteProblemList" bson:"favoriteProblemList"`
+
 	JoinedClassroomList  []ClassroomID  `json:"joinedClassroomList" bson:"joinedClassroomList"`
 	OwnClassroomList     []ClassroomID  `json:"ownClassroomList" bson:"ownClassroomList"`
+	AppliedClassroomList []ClassroomID  `json:"appliedClassroomList" bson:"appliedClassroomList"`
 }
