@@ -66,7 +66,23 @@ func CreateNewCoursePlan(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetCoursePlanByID(w http.ResponseWriter, r *http.Request) {
-	
+	id := mux.Vars(r)["cpid"]
+	objId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		// invalid id format
+		log.Println(err)
+		return
+	}
+	filter := bson.D{{"_id", objId}}
+	sortby := bson.D{}
+	coursePlan, err := db.GetSingleCoursePlan(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "course plan not found.", 404)
+		return
+	}
+	util.ResponseJSON(w, coursePlan)
 }
 
 func UpdateCoursePlanByID(w http.ResponseWriter, r *http.Request) {
