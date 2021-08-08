@@ -91,9 +91,12 @@ func ApplyForClassroom(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 401)
 		return
 	}
-
 	uid := user_obj.UserID
+
 	update := bson.D{}
+
+	// TODO: Prevent replication
+	// TODO: Prevent application for owned classroom
 
 	if !classroom.Apply {
 		http.Error(w, "classroom not available.", 404)
@@ -136,7 +139,93 @@ func ApplyForClassroom(w http.ResponseWriter, r *http.Request) {
 }
 
 func AcceptApplication(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["crid"]
+	crid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		// invalid id format
+		log.Println(err)
+		return
+	}
+	filter := bson.D{{"_id", crid}}
+	sortby := bson.D{}
+	classroom, err := db.GetSingleClassroom(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "classroom not found.", 404)
+		return
+	}
 
+	user_obj, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	uid := user_obj.UserID
+
+	if uid != classroom.Creator {
+		http.Error(w, "permission denied. not classroom creator.", 401)
+		return
+	}
+
+	uid = mux.Vars(r)["uid"]
+	filter = bson.D{{"_id", uid}}
+	sortby = bson.D{}
+	user_obj, err = db.GetSingleUser(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "user not found.", 404)
+		return
+	}
+
+	update := bson.D{}
+
+	if !util.Contain_str(classroom.Applicants, uid) || !util.Contain_ID(user_obj.AppliedClassroomList, crid) {
+		http.Error(w, "user had not applied for the classroom.", 404)
+		return
+	}
+
+	if !util.Contain_ID(user_obj.JoinedClassroomList, crid) {
+		filter = bson.D{{"_id", uid}}
+		update = bson.D{{"$push", bson.D{{"appliedClassroomList", crid}}}}
+		_, err = db.UpdateUser(filter, update, false)
+		if err != nil {
+			http.Error(w, err.Error(), 404)
+			return
+		}
+	}
+
+	if util.Contain_str(classroom.Students, uid) {
+		http.Error(w, "user had already been added into the classroom.", 404)
+		return
+	}
+
+	filter = bson.D{{"_id", crid}}
+	update = bson.D{{"$push", bson.D{{"students", uid}}}}
+	_, err = db.UpdateClassroom(filter, update, false)
+	if err != nil {
+		http.Error(w, err.Error(), 404)
+		return
+	}
+
+	filter = bson.D{{"_id", uid}}
+	update = bson.D{{"$pull", bson.D{{"appliedClassroomList", crid}}}}
+	_, err = db.UpdateUser(filter, update, false)
+	if err != nil {
+		http.Error(w, err.Error(), 404)
+		return
+	}
+
+	filter = bson.D{{"_id", crid}}
+	update = bson.D{{"$pull", bson.D{{"applicants", uid}}}}
+	_, err = db.UpdateClassroom(filter, update, false)
+	if err != nil {
+		http.Error(w, err.Error(), 404)
+		return
+	}
+
+	w.WriteHeader(200)
 }
 
 func InviteStudent(w http.ResponseWriter, r *http.Request) {
