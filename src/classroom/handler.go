@@ -13,9 +13,9 @@ import (
 	"github.com/Leng-Kai/bow-code-API-server/user"
 	"github.com/Leng-Kai/bow-code-API-server/util"
 
-	// "github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
-	// "go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func init() {
@@ -86,7 +86,23 @@ func GetClassroomStatus(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetClassroomByID(w http.ResponseWriter, r *http.Request) {
-
+	id := mux.Vars(r)["crid"]
+	objId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		// invalid id format
+		log.Println(err)
+		return
+	}
+	filter := bson.D{{"_id", objId}}
+	sortby := bson.D{}
+	classroom, err := db.GetSingleClassroom(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "classroom not found.", 404)
+		return
+	}
+	util.ResponseJSON(w, classroom)
 }
 
 func UpdateClassroomByID(w http.ResponseWriter, r *http.Request) {
