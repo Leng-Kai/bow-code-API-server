@@ -168,3 +168,11 @@ func SubmitToProblem(w http.ResponseWriter, r *http.Request) {
 	}{SubmissionID: sid}
 	util.ResponseJSON(w, resp)
 }
+
+func ReceiveJudgeResult_Classroom(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func SubmitToProblem_Classroom(w http.ResponseWriter, r *http.Request) {
+	
+}
