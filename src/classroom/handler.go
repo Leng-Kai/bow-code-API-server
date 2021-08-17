@@ -263,3 +263,11 @@ func GetClassroomByID(w http.ResponseWriter, r *http.Request) {
 func UpdateClassroomByID(w http.ResponseWriter, r *http.Request) {
 
 }
+
+func GetClassroomRecord(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func GetStudentScores(w http.ResponseWriter, r *http.Request) {
+
+}
