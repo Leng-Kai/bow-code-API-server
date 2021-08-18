@@ -62,6 +62,18 @@ func CreateNewClassroom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	newClassroomRecord := schemas.ClassroomRecord{ ClassroomRecordID: id, ScoreEntryList: []schemas.ScoreEntry{} }
+	crrid, err := db.CreateClassroomRecord(newClassroomRecord)
+	if err != nil {
+		log.Println(err)
+		// http.Error()
+		return
+	}
+	if crrid != id {
+		http.Error(w, "unexpected error.", 404)
+		return
+	}
+
 	resp := struct {
 		ClassroomID schemas.ID
 	}{ClassroomID: id}
