@@ -145,6 +145,12 @@ func ApplyForClassroom(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), 404)
 			return
 		}
+
+		err = AddRecordsForNewStudent(crid, uid)
+		if err != nil {
+			http.Error(w, err.Error(), 404)
+			return
+		}
 	}
 
 	w.WriteHeader(200)
@@ -232,6 +238,12 @@ func AcceptApplication(w http.ResponseWriter, r *http.Request) {
 	filter = bson.D{{"_id", crid}}
 	update = bson.D{{"$pull", bson.D{{"applicants", uid}}}}
 	_, err = db.UpdateClassroom(filter, update, false)
+	if err != nil {
+		http.Error(w, err.Error(), 404)
+		return
+	}
+
+	err = AddRecordsForNewStudent(crid, uid)
 	if err != nil {
 		http.Error(w, err.Error(), 404)
 		return
