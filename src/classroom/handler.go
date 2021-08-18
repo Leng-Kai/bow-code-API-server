@@ -265,7 +265,43 @@ func UpdateClassroomByID(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetClassroomRecord(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["crid"]
+	objId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		// invalid id format
+		log.Println(err)
+		return
+	}
+	filter := bson.D{{"_id", objId}}
+	sortby := bson.D{}
+	classroom, err := db.GetSingleClassroom(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "classroom not found.", 404)
+		return
+	}
+	classroomRecord, err := db.GetSingleClassroomRecord(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "classroom record not found.", 404)
+		return
+	}
 
+	user_obj, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	uid := user_obj.UserID
+
+	if uid != classroom.Creator {
+		http.Error(w, "permission denied. not classroom creator.", 401)
+		return
+	}
+
+	util.ResponseJSON(w, classroomRecord)
 }
 
 func GetStudentScores(w http.ResponseWriter, r *http.Request) {
