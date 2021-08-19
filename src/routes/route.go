@@ -64,7 +64,7 @@ func init() {
 	register("PUT", "/submit/{sid}/{caseNo}", submit.ReceiveJudgeResult, nil)
 	register("PUT", "/submit/{crid}/{sid}/{caseNo}", submit.ReceiveJudgeResult_Classroom, nil)
 	register("POST", "/submit/problem/{pid}", submit.SubmitToProblem, nil)
-	register("POST", "/submit/{crid}/problem/{pid}", submit.SubmitToProblem_Classroom, nil)
+	// register("POST", "/submit/{crid}/problem/{pid}", submit.SubmitToProblem_Classroom, nil)
 
 	/* Classroom */
 	register("GET", "/classroom", classroom.GetClassrooms, nil)
