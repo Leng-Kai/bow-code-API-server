@@ -329,5 +329,51 @@ func GetClassroomRecord(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetStudentScores(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["crid"]
+	crid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		// invalid id format
+		log.Println(err)
+		return
+	}
+	uid_student := mux.Vars(r)["uid"]
 
+	user_obj, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	uid := user_obj.UserID
+
+	filter := bson.D{{"_id", crid}}
+	sortby := bson.D{}
+	classroom, err := db.GetSingleClassroom(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "classroom not found.", 404)
+		return
+	}
+	if uid != classroom.Creator && uid != uid_student {
+		http.Error(w, "permission denied.", 401)
+		return
+	}
+	
+	classroomRecord, err := db.GetSingleClassroomRecord(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "classroom record not found.", 404)
+		return
+	}
+
+	scoreEntryList := classroomRecord.ScoreEntryList
+	scoreEntries := []schemas.ScoreEntry{}
+	for _, scoreEntry := range scoreEntryList {
+		if scoreEntry.UserID == uid_student {
+			scoreEntries = append(scoreEntries, scoreEntry)
+		}
+	}
+
+	util.ResponseJSON(w, scoreEntries)
 }
