@@ -23,7 +23,7 @@ func init() {
 
 }
 
-func SendJudgeRequests(problem Problem, us UserSubmission, sid SubmissionID) error {
+func SendJudgeRequests(problem Problem, us UserSubmission, sid SubmissionID, crid string) error {
 	var err error
 	source_code := us.SourceCode
 	language_id := us.LanguageID
@@ -36,6 +36,9 @@ func SendJudgeRequests(problem Problem, us UserSubmission, sid SubmissionID) err
 		stdin := inputs[i]
 		expected_output := outputs[i]
 		callback_url := fmt.Sprintf("%s/submit/%s/%d", self_url, sid.Hex(), i)
+		if len(crid) > 0 {
+			callback_url = fmt.Sprintf("%s/submit/%s/%s/%d", self_url, crid, sid.Hex(), i)
+		}
 
 		url := fmt.Sprintf("%s/%s", os.Getenv("JUDGE0_URL"), "submissions")
 		body := judgeRequest{
