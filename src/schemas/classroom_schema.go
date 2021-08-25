@@ -8,8 +8,8 @@ type ClassroomID = ID
 
 type CProblem struct {
 	ProblemID ProblemID `json:"pid" bson:"pid"`
-	Begin     time.Time `json:"begin" bson:"begin"`
-	End       time.Time `json:"end" bson:"end"`
+	Begin     int       `json:"begin" bson:"begin"`
+	End       int       `json:"end" bson:"end"`
 }
 
 type Classroom struct {

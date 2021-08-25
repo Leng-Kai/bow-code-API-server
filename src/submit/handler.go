@@ -228,7 +228,7 @@ func ReceiveJudgeResult_Classroom(w http.ResponseWriter, r *http.Request) {
 		}}}}},
 	}}}
 	update = bson.D{{"$max", bson.D{{"scoreEntryList.score", score}}}}
-	_, err = db.UpdateClassroomRecord(filter, update, false)
+	_, err = db.UpdateClassroomRecord(filter, update, true)
 	if err != nil {
 		// failed to update score
 		log.Println(err)
