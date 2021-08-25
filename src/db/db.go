@@ -14,6 +14,8 @@ var classroomrecords *mongo.Collection
 var users *mongo.Collection
 var problems *mongo.Collection
 var submissions *mongo.Collection
+var bulletins *mongo.Collection
+var bulletinboards *mongo.Collection
 // var Session *mongo.Collection
 
 func InitDB(client *mongo.Client) {

@@ -285,7 +285,57 @@ func GetClassroomByID(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateClassroomByID(w http.ResponseWriter, r *http.Request) {
+	body, err := util.GetBody(r)
+	if err != nil {
+		// http.Error()
+		return
+	}
+	id := mux.Vars(r)["crid"]
+	objId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		// invalid id format
+		log.Println(err)
+		return
+	}
+	filter := bson.D{{"_id", objId}}
+	sortby := bson.D{}
+	classroom, err := db.GetSingleClassroom(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "classroom not found.", 404)
+		return
+	}
 
+	user_obj, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	uid := user_obj.UserID
+
+	if uid != classroom.Creator {
+		http.Error(w, "permission denied. not classroom creator.", 401)
+		return
+	}
+
+	var updatedClassroom map[string]interface{}
+	err = json.Unmarshal(body, &updatedClassroom)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+
+	log.Println(updatedClassroom)
+
+	for key, value := range updatedClassroom {
+		update := bson.D{{"$set", bson.D{{key, value}}}}
+		_, err = db.UpdateClassroom(filter, update, false)
+		if err != nil {
+			http.Error(w, err.Error(), 404)
+			return
+		}
+	}
 }
 
 func GetClassroomRecord(w http.ResponseWriter, r *http.Request) {

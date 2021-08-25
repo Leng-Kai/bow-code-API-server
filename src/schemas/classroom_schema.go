@@ -6,6 +6,12 @@ import (
 
 type ClassroomID = ID
 
+type CProblem struct {
+	ProblemID ProblemID `json:"pid" bson:"pid"`
+	Begin     time.Time `json:"begin" bson:"begin"`
+	End       time.Time `json:"end" bson:"end"`
+}
+
 type Classroom struct {
 	ClassroomID  ClassroomID  `json:"id" bson:"_id,omitempty"`
 	Name         string       `json:"name" bson:"name"`
@@ -17,6 +23,8 @@ type Classroom struct {
 	Applicants   []UserID     `json:"applicants" bson:"applicants"`
 	Invitees     []UserID     `json:"invitees" bson:"invitees"`
 	BulletinList []Bulletin   `json:"bulletinList" bson:"bulletinList"`
+	HomeworkList []CProblem   `json:"homeworkList" bson:"homeworkList"`
+	ExamList     []CProblem   `json:"examList" bson:"examList"`
 	Visibility   int          `json:"visibility" bson:"visibility"`
 	CreateTime   time.Time    `json:"createTime" bson:"createTime"`
 }
