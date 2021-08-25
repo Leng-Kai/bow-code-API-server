@@ -23,5 +23,7 @@ func InitDB(client *mongo.Client) {
 	users = db.Database(db_name).Collection("users")
 	problems = db.Database(db_name).Collection("problems")
 	submissions = db.Database(db_name).Collection("submissions")
+	bulletins = db.Database(db_name).Collection("bulletins")
+	bulletinboards = db.Database(db_name).Collection("bulletinboards")
 	// Session = db.Database("SessionDB").Collection("sessions")
 }
