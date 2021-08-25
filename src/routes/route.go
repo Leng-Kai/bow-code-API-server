@@ -62,7 +62,9 @@ func init() {
 	register("GET", "/submit/user", submit.GetSubmissionsByUID, nil)
 	register("GET", "/submit/{sid}", submit.GetSubmissionByID, nil)
 	register("PUT", "/submit/{sid}/{caseNo}", submit.ReceiveJudgeResult, nil)
+	register("PUT", "/submit/{crid}/{sid}/{caseNo}", submit.ReceiveJudgeResult_Classroom, nil)
 	register("POST", "/submit/problem/{pid}", submit.SubmitToProblem, nil)
+	// register("POST", "/submit/{crid}/problem/{pid}", submit.SubmitToProblem_Classroom, nil)
 
 	/* Classroom */
 	register("GET", "/classroom", classroom.GetClassrooms, nil)
@@ -72,6 +74,8 @@ func init() {
 	register("POST", "/classroom/invite/{crid}/{uid}", classroom.InviteStudent, nil)
 	register("POST", "/classroom/join/{crid}", classroom.JoinClassroom, nil)
 	register("GET", "/classroom/status/{crid}", classroom.GetClassroomStatus, nil)
+	register("GET", "/classroom/record/{crid}", classroom.GetClassroomRecord, nil)
+	register("GET", "/classroom/score/{crid}/{uid}", classroom.GetStudentScores, nil)
 	register("GET", "/classroom/{crid}", classroom.GetClassroomByID, nil)
 	register("POST", "/classroom/{crid}", classroom.UpdateClassroomByID, nil)
 	

@@ -62,6 +62,18 @@ func CreateNewClassroom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	newClassroomRecord := schemas.ClassroomRecord{ ClassroomRecordID: id, ScoreEntryList: []schemas.ScoreEntry{} }
+	crrid, err := db.CreateClassroomRecord(newClassroomRecord)
+	if err != nil {
+		log.Println(err)
+		// http.Error()
+		return
+	}
+	if crrid != id {
+		http.Error(w, "unexpected error.", 404)
+		return
+	}
+
 	resp := struct {
 		ClassroomID schemas.ID
 	}{ClassroomID: id}
@@ -129,6 +141,12 @@ func ApplyForClassroom(w http.ResponseWriter, r *http.Request) {
 		filter = bson.D{{"_id", crid}}
 		update = bson.D{{"$push", bson.D{{"students", uid}}}}
 		_, err = db.UpdateClassroom(filter, update, false)
+		if err != nil {
+			http.Error(w, err.Error(), 404)
+			return
+		}
+
+		err = AddRecordsForNewStudent(crid, uid)
 		if err != nil {
 			http.Error(w, err.Error(), 404)
 			return
@@ -225,6 +243,12 @@ func AcceptApplication(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	err = AddRecordsForNewStudent(crid, uid)
+	if err != nil {
+		http.Error(w, err.Error(), 404)
+		return
+	}
+
 	w.WriteHeader(200)
 }
 
@@ -262,4 +286,94 @@ func GetClassroomByID(w http.ResponseWriter, r *http.Request) {
 
 func UpdateClassroomByID(w http.ResponseWriter, r *http.Request) {
 
+}
+
+func GetClassroomRecord(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["crid"]
+	objId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		// invalid id format
+		log.Println(err)
+		return
+	}
+	filter := bson.D{{"_id", objId}}
+	sortby := bson.D{}
+	classroom, err := db.GetSingleClassroom(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "classroom not found.", 404)
+		return
+	}
+	classroomRecord, err := db.GetSingleClassroomRecord(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "classroom record not found.", 404)
+		return
+	}
+
+	user_obj, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	uid := user_obj.UserID
+
+	if uid != classroom.Creator {
+		http.Error(w, "permission denied. not classroom creator.", 401)
+		return
+	}
+
+	util.ResponseJSON(w, classroomRecord)
+}
+
+func GetStudentScores(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["crid"]
+	crid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		// invalid id format
+		log.Println(err)
+		return
+	}
+	uid_student := mux.Vars(r)["uid"]
+
+	user_obj, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	uid := user_obj.UserID
+
+	filter := bson.D{{"_id", crid}}
+	sortby := bson.D{}
+	classroom, err := db.GetSingleClassroom(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "classroom not found.", 404)
+		return
+	}
+	if uid != classroom.Creator && uid != uid_student {
+		http.Error(w, "permission denied.", 401)
+		return
+	}
+	
+	classroomRecord, err := db.GetSingleClassroomRecord(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "classroom record not found.", 404)
+		return
+	}
+
+	scoreEntryList := classroomRecord.ScoreEntryList
+	scoreEntries := []schemas.ScoreEntry{}
+	for _, scoreEntry := range scoreEntryList {
+		if scoreEntry.UserID == uid_student {
+			scoreEntries = append(scoreEntries, scoreEntry)
+		}
+	}
+
+	util.ResponseJSON(w, scoreEntries)
 }

@@ -156,7 +156,7 @@ func SubmitToProblem(w http.ResponseWriter, r *http.Request) {
 	}
 	// log.Println(userSubmission)
 
-	err = SendJudgeRequests(problem, userSubmission, sid)
+	err = SendJudgeRequests(problem, userSubmission, sid, r.URL.Query().Get("classroom"))
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), 404)
@@ -167,4 +167,71 @@ func SubmitToProblem(w http.ResponseWriter, r *http.Request) {
 		SubmissionID schemas.ID
 	}{SubmissionID: sid}
 	util.ResponseJSON(w, resp)
+}
+
+func ReceiveJudgeResult_Classroom(w http.ResponseWriter, r *http.Request) {
+	crid, err := primitive.ObjectIDFromHex(mux.Vars(r)["crid"])
+	if err != nil {
+		// invalid sid format
+		log.Println(err)
+		return
+	}
+	sid, err := primitive.ObjectIDFromHex(mux.Vars(r)["sid"])
+	if err != nil {
+		// invalid sid format
+		log.Println(err)
+		return
+	}
+	caseNo, err := strconv.Atoi(mux.Vars(r)["caseNo"])
+	if err != nil {
+		// invalid case format
+		log.Println(err)
+		return
+	}
+	
+	body, err := util.GetBody(r)
+	result := schemas.Result{}
+	_ = json.Unmarshal(body, &result)
+
+	newJudgement := schemas.Judgement{
+		TestcaseNo: caseNo, Token: result.Token, Status: result.Status.ID,
+	}
+
+	filter := bson.D{{"_id", sid}}
+	update := bson.D{{"$push", bson.D{{"judgements", newJudgement}}}}
+	_, err = db.UpdateSubmission(filter, update, false)
+
+	update = bson.D{{"$inc", bson.D{{"judgementCompleted", 1}}}}
+	_, err = db.UpdateSubmission(filter, update, false)
+
+	update = bson.D{{"$bit", bson.D{{"status", bson.D{{"or", Status2Flag[result.Status.ID]}}}}}}
+	_, err = db.UpdateSubmission(filter, update, false)
+
+	sortby := bson.D{}
+	submission, err := db.GetSingleSubmission(filter, sortby)
+	if submission.JudgementCompleted < submission.TestcaseCnt {
+		return
+	}
+
+	score := 0
+	for _, judgement := range submission.Judgements {
+		if judgement.Status == 0x0000 {
+			score += 1
+		}
+	}
+
+	filter = bson.D{{"$and", []bson.D{
+		bson.D{{"_id", crid}},
+		bson.D{{"scoreEntryList", bson.D{{"$and", []bson.D{
+			bson.D{{"userID", submission.Creator}},
+			bson.D{{"problemID", submission.Problem}},
+		}}}}},
+	}}}
+	update = bson.D{{"$max", bson.D{{"scoreEntryList.score", score}}}}
+	_, err = db.UpdateClassroomRecord(filter, update, false)
+	if err != nil {
+		// failed to update score
+		log.Println(err)
+		return
+	}
 }
