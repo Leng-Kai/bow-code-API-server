@@ -29,13 +29,13 @@ func GetCoursePlans(w http.ResponseWriter, r *http.Request) {
 func CreateNewCoursePlan(w http.ResponseWriter, r *http.Request) {
 	body, err := util.GetBody(r)
 	if err != nil {
-		// http.Error()
+		http.Error(w, err.Error(), 401)
 		return
 	}
 	newCoursePlan := schemas.CoursePlan{}
 	err = json.Unmarshal(body, &newCoursePlan)
 	if err != nil {
-		// http.Error()
+		http.Error(w, err.Error(), 401)
 		return
 	}
 	creator, err := user.GetSessionUser(r)

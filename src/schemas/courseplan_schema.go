@@ -7,8 +7,8 @@ import (
 type CoursePlanID = ID
 
 type CoursePlanComponent struct {
-	Type int `json:"type" bson:"type"`
-	ID   ID  `json:"id" bson:"id"`
+	Type   int  `json:"type" bson:"type"`
+	IDList []ID `json:"idList" bson:"idList"`
 }
 
 type CoursePlan struct {

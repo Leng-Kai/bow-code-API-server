@@ -32,8 +32,12 @@ func AddRecordsForNewStudent(crid schemas.ClassroomID, uid schemas.UserID) error
 
 	for _, component := range componentList {
 		if component.Type == course_plan.PROBLEM {
-			scoreEntry := schemas.ScoreEntry{ UserID: uid, ProblemID: component.ID, Score: -1 }
-			scoreEntries = append(scoreEntries, scoreEntry)
+			// scoreEntry := schemas.ScoreEntry{ UserID: uid, ProblemID: component.ID, Score: -1 }
+			// scoreEntries = append(scoreEntries, scoreEntry)
+			for _, pid := range component.IDList {
+				scoreEntry := schemas.ScoreEntry{ UserID: uid, ProblemID: pid, Score: -1 }
+				scoreEntries = append(scoreEntries, scoreEntry)
+			}
 		}
 	}
 
