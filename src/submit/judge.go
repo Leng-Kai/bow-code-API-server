@@ -3,6 +3,7 @@ package submit
 import (
 	"fmt"
 	"encoding/json"
+	// "log"
 	"os"
 
 	. "github.com/Leng-Kai/bow-code-API-server/schemas"
@@ -39,7 +40,6 @@ func SendJudgeRequests(problem Problem, us UserSubmission, sid SubmissionID, cri
 		if len(crid) > 0 {
 			callback_url = fmt.Sprintf("%s/submit/%s/%s/%d", self_url, crid, sid.Hex(), i)
 		}
-
 		url := fmt.Sprintf("%s/%s", os.Getenv("JUDGE0_URL"), "submissions")
 		body := judgeRequest{
 			source_code, language_id, stdin, expected_output, callback_url,

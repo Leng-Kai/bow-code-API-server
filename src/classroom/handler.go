@@ -148,11 +148,11 @@ func ApplyForClassroom(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		err = AddRecordsForNewStudent(crid, uid)
-		if err != nil {
-			http.Error(w, err.Error(), 404)
-			return
-		}
+		// err = AddRecordsForNewStudent(crid, uid)
+		// if err != nil {
+		// 	http.Error(w, err.Error(), 404)
+		// 	return
+		// }
 	}
 
 	w.WriteHeader(200)

@@ -215,20 +215,31 @@ func ReceiveJudgeResult_Classroom(w http.ResponseWriter, r *http.Request) {
 
 	score := 0
 	for _, judgement := range submission.Judgements {
-		if judgement.Status == 0x0000 {
+		if judgement.Status == 3 {
 			score += 1
 		}
 	}
 
+	filter = bson.D{{"_id", crid}}
+	update = bson.D{{"$addToSet", bson.D{{"scoreEntryList", schemas.ScoreEntry{UserID: submission.Creator, ProblemID: submission.Problem}}}}}
+	_, err = db.UpdateClassroomRecord(filter, update, false)
+	if err != nil {
+		// failed to update score entry
+		log.Println(err)
+		return
+	}
+
 	filter = bson.D{{"$and", []bson.D{
 		bson.D{{"_id", crid}},
-		bson.D{{"scoreEntryList", bson.D{{"$and", []bson.D{
-			bson.D{{"userID", submission.Creator}},
-			bson.D{{"problemID", submission.Problem}},
-		}}}}},
+		// bson.D{{"scoreEntryList", bson.D{{"$and", []bson.D{
+		// 	bson.D{{"userID", submission.Creator}},
+		// 	bson.D{{"problemID", submission.Problem}},
+		// }}}}},
+		bson.D{{"scoreEntryList.userID", submission.Creator}},
+		bson.D{{"scoreEntryList.problemID", submission.Problem}},
 	}}}
-	update = bson.D{{"$max", bson.D{{"scoreEntryList.score", score}}}}
-	_, err = db.UpdateClassroomRecord(filter, update, true)
+	update = bson.D{{"$max", bson.D{{"scoreEntryList.$.score", score}}}}
+	_, err = db.UpdateClassroomRecord(filter, update, false)
 	if err != nil {
 		// failed to update score
 		log.Println(err)
