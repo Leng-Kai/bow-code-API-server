@@ -137,6 +137,31 @@ func GetMultipleCourses(w http.ResponseWriter, r *http.Request) {
 	util.ResponseJSON(w, resp)
 }
 
+func GetCoursesDetails(w http.ResponseWriter, r *http.Request) {
+	body, err := util.GetBody(r)
+	if err != nil {
+		// http.Error()
+		return
+	}
+	courseIDList := []schemas.CourseID{}
+	err = json.Unmarshal(body, &courseIDList)
+	if err != nil {
+		// http.Error()
+		return
+	}
+
+	courseList := []schemas.Course{}
+	for _, cid := range courseIDList {
+		course, _ := db.GetSingleCourse(bson.D{{"_id", cid}}, bson.D{})
+		courseList = append(courseList, course)
+	}
+
+	resp := struct {
+		CourseList []schemas.Course `json:"courseList"`
+	}{CourseList: courseList}
+	util.ResponseJSON(w, resp)
+}
+
 func UpdateCourseByID(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	objId, err := primitive.ObjectIDFromHex(id)
