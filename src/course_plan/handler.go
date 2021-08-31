@@ -46,6 +46,25 @@ func CreateNewCoursePlan(w http.ResponseWriter, r *http.Request) {
 
 	newCoursePlan.Creator = creator.UserID
 	newCoursePlan.CreateTime = time.Now()
+
+	var course schemas.Course
+	var problem schemas.Problem
+
+	for i, component := range newCoursePlan.ComponentList {
+		if component.Type == COURSE {
+			for j, set := range component.SetList {
+				course, _ = db.GetSingleCourse(bson.D{{"_id", set.ID}}, bson.D{})
+				newCoursePlan.ComponentList[i].SetList[j].Name = course.Name
+			}
+		} else {
+			for j, set := range component.SetList {
+				problem, _ = db.GetSingleProblem(bson.D{{"_id", set.ID}}, bson.D{})
+				newCoursePlan.ComponentList[i].SetList[j].Name = problem.Name
+				newCoursePlan.ComponentList[i].SetList[j].TotalScore = problem.TotalScore
+			}
+		}
+	}
+
 	id, err := db.CreateCoursePlan(newCoursePlan)
 	if err != nil {
 		log.Println(err)

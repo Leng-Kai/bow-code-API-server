@@ -7,9 +7,9 @@ import (
 type CoursePlanID = ID
 
 type Set struct {
-	Name      string `json:"name" bson:"name"`
-	ID        ID     `json:"id" bson:"id"`
-	FullScore int    `json:"fullScore" bson:"fullScore"`
+	Name       string `json:"name" bson:"name"`
+	ID         ID     `json:"id" bson:"id"`
+	TotalScore int    `json:"totalScore" bson:"totalScore"`
 }
 
 type CoursePlanComponent struct {
