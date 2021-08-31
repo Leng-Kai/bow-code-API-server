@@ -8,6 +8,7 @@ import (
 	// "strings"
 	"time"
 
+	. "github.com/Leng-Kai/bow-code-API-server/course_plan"
 	"github.com/Leng-Kai/bow-code-API-server/db"
 	"github.com/Leng-Kai/bow-code-API-server/schemas"
 	"github.com/Leng-Kai/bow-code-API-server/user"
@@ -49,8 +50,22 @@ func CreateNewClassroom(w http.ResponseWriter, r *http.Request) {
 	newClassroom.Students = []schemas.UserID{}
 	newClassroom.Applicants = []schemas.UserID{}
 	newClassroom.Invitees = []schemas.UserID{}
-	newClassroom.HomeworkList = []schemas.CProblem{}
-	newClassroom.ExamList = []schemas.CProblem{}
+	newClassroom.CourseList = []schemas.ClassroomComponent{}
+	newClassroom.HomeworkList = []schemas.ClassroomComponent{}
+	newClassroom.ExamList = []schemas.ClassroomComponent{}
+
+	coursePlan, _ := db.GetSingleCoursePlan(bson.D{{"_id", newClassroom.CoursePlan}}, bson.D{})
+	for _, component := range coursePlan.ComponentList {
+		classroomComponent := schemas.ClassroomComponent{ Component: component, Begin: -1, End: -1, Private: false }
+		if component.Type == COURSE {
+			newClassroom.CourseList = append(newClassroom.CourseList, classroomComponent)
+		} else if component.Type == HOMEWORK {
+			newClassroom.HomeworkList = append(newClassroom.HomeworkList, classroomComponent)
+		} else if component.Type == EXAM {
+			newClassroom.ExamList = append(newClassroom.ExamList, classroomComponent)
+		}
+	}
+
 	id, err := db.CreateClassroom(newClassroom)
 	if err != nil {
 		log.Println(err)
@@ -463,14 +478,14 @@ func CreateHomework(w http.ResponseWriter, r *http.Request) {
 		// http.Error()
 		return
 	}
-	newCProblem := schemas.CProblem{}
-	err = json.Unmarshal(body, &newCProblem)
+	newClassroomComponent := schemas.ClassroomComponent{}
+	err = json.Unmarshal(body, &newClassroomComponent)
 	if err != nil {
 		// http.Error()
 		return
 	}
 
-	update := bson.D{{"$push", bson.D{{"homeworkList", newCProblem}}}}
+	update := bson.D{{"$push", bson.D{{"homeworkList", newClassroomComponent}}}}
 	_, err = db.UpdateClassroom(filter, update, false)
 	if err != nil {
 		http.Error(w, err.Error(), 404)
@@ -511,14 +526,14 @@ func CreateExam(w http.ResponseWriter, r *http.Request) {
 		// http.Error()
 		return
 	}
-	newCProblem := schemas.CProblem{}
-	err = json.Unmarshal(body, &newCProblem)
+	newClassroomComponent := schemas.ClassroomComponent{}
+	err = json.Unmarshal(body, &newClassroomComponent)
 	if err != nil {
 		// http.Error()
 		return
 	}
 
-	update := bson.D{{"$push", bson.D{{"examList", newCProblem}}}}
+	update := bson.D{{"$push", bson.D{{"examList", newClassroomComponent}}}}
 	_, err = db.UpdateClassroom(filter, update, false)
 	if err != nil {
 		http.Error(w, err.Error(), 404)
