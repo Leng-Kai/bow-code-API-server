@@ -213,10 +213,11 @@ func ReceiveJudgeResult_Classroom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	problem, _ := db.GetSingleProblem(bson.D{{"_id", submission.Problem}}, bson.D{})
 	score := 0
 	for _, judgement := range submission.Judgements {
 		if judgement.Status == 3 {
-			score += 1
+			score += problem.Testcase.Score[judgement.TestcaseNo]
 		}
 	}
 
