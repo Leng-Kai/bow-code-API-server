@@ -5,10 +5,12 @@ import (
 )
 
 type ProblemID = ID
+
 type Testcase struct {
 	TestcaseCnt    int      `json:"testcaseCnt", bson:"testcaseCnt`
 	Input          []string `json:"input" bson:"input"`
 	ExpectedOutput []string `json:"expectedOutput" bson:"expectedOutput"`
+	Score          []int    `json:"score" bson:"score"`
 }
 
 type Problem struct {
@@ -18,12 +20,12 @@ type Problem struct {
 	Description    string    `json:"description" bson:"description"`
 	DefaultContent string    `json:"defaultContent" bson:"defaultContent"`
 	Testcase       Testcase  `json:"testcase" bson:"testcase"`
+	TotalScore     int       `json:"totalScore" bson:"totalScore"`
 	Tags           []string  `json:"tags" bson:"tags"`
 	Difficulty     int       `json:"difficulty" bson:"difficulty"`
 	Category       string    `json:"category" bson:"category"`
-	// IsPublic       bool      `json:"isPublic" bson:"isPublic"`
-	Visibility int       `json:"visibility" bson:"visibility"`
-	CreateTime time.Time `json:"createTime" bson:"createTime"`
+	Visibility     int       `json:"visibility" bson:"visibility"`
+	CreateTime     time.Time `json:"createTime" bson:"createTime"`
 }
 
 type TagCount struct {

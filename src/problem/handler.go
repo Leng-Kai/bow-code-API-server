@@ -45,7 +45,11 @@ func CreateNewProblem(w http.ResponseWriter, r *http.Request) {
 
 	newProblem.Creator = creator.UserID
 	newProblem.CreateTime = time.Now()
-	log.Println(newProblem)
+	newProblem.TotalScore = 0
+	for _, score := range newProblem.Testcase.Score {
+		newProblem.TotalScore += score
+	}
+
 	id, err := db.CreateProblem(newProblem)
 	if err != nil {
 		log.Println(err)
