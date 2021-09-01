@@ -15,7 +15,7 @@ type Set struct {
 type CoursePlanComponent struct {
 	Name    string `json:"name" bson:"name"`
 	Type    int    `json:"type" bson:"type"`
-	SetList []Set  `json:"SetList" bson:"SetList"`
+	SetList []Set  `json:"setList" bson:"setList"`
 }
 
 type CoursePlan struct {
