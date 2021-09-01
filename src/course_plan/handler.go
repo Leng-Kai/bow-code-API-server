@@ -105,5 +105,55 @@ func GetCoursePlanByID(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateCoursePlanByID(w http.ResponseWriter, r *http.Request) {
+	body, err := util.GetBody(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	id := mux.Vars(r)["cpid"]
+	cpid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	filter := bson.D{{"_id", cpid}}
+	sortby := bson.D{}
+	coursePlan, err := db.GetSingleCoursePlan(filter, sortby)
+	if err != nil {
+		http.Error(w, "course plan not found.", 404)
+		return
+	}
 
+	user_obj, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	uid := user_obj.UserID
+
+	if uid != coursePlan.Creator {
+		http.Error(w, "permission denied. not course plan creator.", 401)
+		return
+	}
+
+	var updatedCoursePlan map[string]interface{}
+	err = json.Unmarshal(body, &updatedCoursePlan)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+
+	// prevent other attributes from being changed
+	legal_key := []string{"name", "componentList", "visibility"}
+
+	for key, value := range updatedCoursePlan {
+		if util.Contain_str(legal_key, key) {
+			update := bson.D{{"$set", bson.D{{key, value}}}}
+			_, err = db.UpdateCoursePlan(filter, update, false)
+			if err != nil {
+				http.Error(w, err.Error(), 404)
+				return
+			}
+		}
+	}
 }
