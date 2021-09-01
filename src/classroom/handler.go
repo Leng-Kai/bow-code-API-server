@@ -607,5 +607,63 @@ func UpdateHomework(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateExam(w http.ResponseWriter, r *http.Request) {
-	
+	id := mux.Vars(r)["crid"]
+	crid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	filter := bson.D{{"_id", crid}}
+	sortby := bson.D{}
+	classroom, err := db.GetSingleClassroom(filter, sortby)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "classroom not found.", 404)
+		return
+	}
+
+	user_obj, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	uid := user_obj.UserID
+	if uid != classroom.Creator {
+		http.Error(w, "permission denied. not classroom creator.", 401)
+		return
+	}
+
+	no, err := strconv.Atoi(mux.Vars(r)["No"])
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+
+	body, err := util.GetBody(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+
+	var updatedExam struct {
+		Begin   int  `json:"begin"`
+		End     int  `json:"end"`
+		Private bool `json:"private`
+	}
+	err = json.Unmarshal(body, &updatedExam)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+
+	classroom.ExamList[no].Begin = updatedExam.Begin
+	classroom.ExamList[no].End = updatedExam.End
+	classroom.ExamList[no].Private = updatedExam.Private
+
+	update := bson.D{{"$set", bson.D{{"examList", classroom.ExamList}}}}
+	_, err = db.UpdateClassroom(filter, update, false)
+	if err != nil {
+		http.Error(w, err.Error(), 404)
+		return
+	}
 }
