@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	// "strconv"
+	"strconv"
 	// "strings"
 	"time"
 
@@ -298,6 +298,9 @@ func GetClassroomByID(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "classroom not found.", 404)
 		return
 	}
+
+	// modify classroom if corresponding course plan is modified
+
 	util.ResponseJSON(w, classroom)
 }
 
@@ -539,4 +542,70 @@ func CreateExam(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 404)
 		return
 	}
+}
+
+func UpdateHomework(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["crid"]
+	crid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	filter := bson.D{{"_id", crid}}
+	sortby := bson.D{}
+	classroom, err := db.GetSingleClassroom(filter, sortby)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "classroom not found.", 404)
+		return
+	}
+
+	user_obj, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	uid := user_obj.UserID
+	if uid != classroom.Creator {
+		http.Error(w, "permission denied. not classroom creator.", 401)
+		return
+	}
+
+	no, err := strconv.Atoi(mux.Vars(r)["No"])
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+
+	body, err := util.GetBody(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+
+	var updatedHomework struct {
+		Begin   int  `json:"begin"`
+		End     int  `json:"end"`
+		Private bool `json:"private`
+	}
+	err = json.Unmarshal(body, &updatedHomework)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+
+	classroom.HomeworkList[no].Begin = updatedHomework.Begin
+	classroom.HomeworkList[no].End = updatedHomework.End
+	classroom.HomeworkList[no].Private = updatedHomework.Private
+
+	update := bson.D{{"$set", bson.D{{"homeworkList", classroom.HomeworkList}}}}
+	_, err = db.UpdateClassroom(filter, update, false)
+	if err != nil {
+		http.Error(w, err.Error(), 404)
+		return
+	}
+}
+
+func UpdateExam(w http.ResponseWriter, r *http.Request) {
+	
 }

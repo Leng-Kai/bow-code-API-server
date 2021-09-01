@@ -80,6 +80,8 @@ func init() {
 
 	register("POST", "/classroom/homework/{crid}", classroom.CreateHomework, nil)
 	register("POST", "/classroom/exam/{crid}", classroom.CreateExam, nil)
+	register("PUT", "/classroom/homework/{crid}/{No}", classroom.UpdateHomework, nil)
+	register("PUT", "/classroom/exam/{crid}/{No}", classroom.UpdateExam, nil)
 
 	register("GET", "/classroom/{crid}", classroom.GetClassroomByID, nil)
 	register("POST", "/classroom/{crid}", classroom.UpdateClassroomByID, nil)
