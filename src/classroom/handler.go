@@ -584,9 +584,10 @@ func UpdateHomework(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var updatedHomework struct {
-		Begin   int  `json:"begin"`
-		End     int  `json:"end"`
-		Private bool `json:"private`
+		Component schemas.CoursePlanComponent `json:"component"`
+		Begin     int  				  		  `json:"begin"`
+		End       int  				  		  `json:"end"`
+		Private   bool 				  		  `json:"private`
 	}
 	err = json.Unmarshal(body, &updatedHomework)
 	if err != nil {
@@ -594,6 +595,7 @@ func UpdateHomework(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	classroom.HomeworkList[no].Component = updatedHomework.Component
 	classroom.HomeworkList[no].Begin = updatedHomework.Begin
 	classroom.HomeworkList[no].End = updatedHomework.End
 	classroom.HomeworkList[no].Private = updatedHomework.Private
@@ -646,6 +648,7 @@ func UpdateExam(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var updatedExam struct {
+		Component schemas.CoursePlanComponent `json:"component"`
 		Begin   int  `json:"begin"`
 		End     int  `json:"end"`
 		Private bool `json:"private`
@@ -656,6 +659,7 @@ func UpdateExam(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	classroom.ExamList[no].Component = updatedExam.Component
 	classroom.ExamList[no].Begin = updatedExam.Begin
 	classroom.ExamList[no].End = updatedExam.End
 	classroom.ExamList[no].Private = updatedExam.Private
