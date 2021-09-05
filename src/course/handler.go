@@ -138,16 +138,16 @@ func GetMultipleCourses(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetCoursesDetails(w http.ResponseWriter, r *http.Request) {
-	body, err := util.GetBody(r)
-	if err != nil {
-		// http.Error()
-		return
-	}
+	courses := r.URL.Query().Get("courses")
+	courseIDList_str := strings.Split(courses, ",")
 	courseIDList := []schemas.CourseID{}
-	err = json.Unmarshal(body, &courseIDList)
-	if err != nil {
-		// http.Error()
-		return
+	for _, courseID_str := range courseIDList_str {
+		courseID_objID, err := primitive.ObjectIDFromHex(courseID_str)
+		if err != nil {
+			http.Error(w, err.Error(), 401)
+			return
+		}
+		courseIDList = append(courseIDList, courseID_objID)
 	}
 
 	courseList := []schemas.Course{}
