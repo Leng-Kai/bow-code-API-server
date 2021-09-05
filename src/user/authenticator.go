@@ -42,19 +42,22 @@ func googleAuthenticator(token interface{}) (string, UserInfo, error) {
 
 	name := payload.Claims["name"].(string)
 	avatar := payload.Claims["picture"].(string)
+	email := payload.Claims["email"].(string)
 	uid := payload.Claims["sub"].(string)
 
-	return uid, UserInfo{name, avatar}, nil
+	return uid, UserInfo{name, avatar, email}, nil
 }
 
 func facebookAuthenticator(payload interface{}) (string, UserInfo, error) {
 	name := "Frank"
 	avatar := "avatar_url"
-	return "facebookUidForTesting", UserInfo{name, avatar}, nil
+	email := "unsupport@facebook.com"
+	return "facebookUidForTesting", UserInfo{name, avatar, email}, nil
 }
 
 func twitterAuthenticator(payload interface{}) (string, UserInfo, error) {
 	name := "Taylor"
 	avatar := "avatar_url"
-	return "twitterUidForTesting", UserInfo{name, avatar}, nil
+	email := "unsupport@twitter.com"
+	return "twitterUidForTesting", UserInfo{name, avatar, email}, nil
 }

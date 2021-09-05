@@ -5,6 +5,7 @@ type UserID = string
 type UserInfo struct {
 	Name   string `json:"name" bson:"name"`
 	Avatar string `json:"avatar" bson:"avatar"`
+	Email  string `json:"email" bson:"email"`
 }
 
 type User struct {
