@@ -122,10 +122,15 @@ func ApplyForClassroom(w http.ResponseWriter, r *http.Request) {
 	}
 	uid := user_obj.UserID
 
-	update := bson.D{}
-
 	// TODO: Prevent replication
+	if util.Contain_str(classroom.Students, uid) {
+		http.Error(w, "Already applied.", 404)
+		return
+	}
+
 	// TODO: Prevent application for owned classroom
+
+	update := bson.D{}
 
 	if !classroom.Apply {
 		http.Error(w, "classroom not available.", 404)
