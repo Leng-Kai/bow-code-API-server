@@ -299,9 +299,25 @@ func GetClassroomByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user_obj, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	uid := user_obj.UserID
+
+	// if uid != classroom.Creator {
+	// 	http.Error(w, "permission denied. not classroom creator.", 401)
+	// 	return
+	// }
+
 	// modify classroom if corresponding course plan is modified
 
-	util.ResponseJSON(w, classroom)
+	resp := struct {
+		Classroom schemas.Classroom `json:"classroom"`
+		IsCreator bool                `json:"isCreator"`
+	}{Classroom: classroom, IsCreator: (uid == classroom.Creator)}
+	util.ResponseJSON(w, resp)
 }
 
 func UpdateClassroomByID(w http.ResponseWriter, r *http.Request) {
@@ -419,7 +435,6 @@ func GetStudentScores(w http.ResponseWriter, r *http.Request) {
 	sortby := bson.D{}
 	classroom, err := db.GetSingleClassroom(filter, sortby)
 	if err != nil {
-		// db error
 		log.Println(err)
 		http.Error(w, "classroom not found.", 404)
 		return
@@ -431,7 +446,6 @@ func GetStudentScores(w http.ResponseWriter, r *http.Request) {
 	
 	classroomRecord, err := db.GetSingleClassroomRecord(filter, sortby)
 	if err != nil {
-		// db error
 		log.Println(err)
 		http.Error(w, "classroom record not found.", 404)
 		return
