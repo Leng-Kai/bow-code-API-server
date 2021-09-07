@@ -96,7 +96,7 @@ func init() {
 	// register("PUT", "/bulletin/reply/{bid}/{index}", bulletin.EditReply, nil)
 	register("POST", "/bulletin/like/{bid}", bulletin.LikeBulletin, nil)
 	register("POST", "/bulletin/unlike/{bid}", bulletin.UnlikeBulletin, nil)
-	// register("DELETE", "/bulletin/{bid}", bulletin.DeleteBulletin, nil)
+	register("DELETE", "/bulletin/{crid}/{bid}", bulletin.DeleteBulletin, nil)
 	// register("PUT", "/bulletin/{bid}", bulletin.EditBulletin, nil)
 	
 	/* Healthy Check */
