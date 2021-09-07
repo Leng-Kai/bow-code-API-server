@@ -9,8 +9,8 @@ type BulletinBoardID = ID
 
 type Reply struct {
 	Creator    UserID    `json:"creator" bson:"creator"`
-	Reactions  []UserID  `json:"reactions" bson:"reactions"`
 	Content    string    `json:"content" bson:"content"`
+	Reactions  []UserID  `json:"reactions" bson:"reactions"`
 	CreateTime time.Time `json:"createTime" bson:"createTime"`
 }
 
@@ -22,9 +22,4 @@ type Bulletin struct {
 	Reactions  []UserID   `json:"reactions" bson:"reactions"`
 	Replies    []Reply    `json:"replies" bson:"replies"`
 	CreateTime time.Time  `json:"createTime" bson:"createTime"`
-}
-
-type BulletinBoard struct {
-	BulletinBoardID BulletinBoardID `json:"id" bson:"_id,omitempty"`
-	BulletinList    []BulletinID    `json:"bulletinList" bson:"bulletinList"`
 }

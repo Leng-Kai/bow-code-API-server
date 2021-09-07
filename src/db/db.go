@@ -15,7 +15,6 @@ var users *mongo.Collection
 var problems *mongo.Collection
 var submissions *mongo.Collection
 var bulletins *mongo.Collection
-var bulletinboards *mongo.Collection
 // var Session *mongo.Collection
 
 func InitDB(client *mongo.Client) {
@@ -28,6 +27,5 @@ func InitDB(client *mongo.Client) {
 	problems = db.Database(db_name).Collection("problems")
 	submissions = db.Database(db_name).Collection("submissions")
 	bulletins = db.Database(db_name).Collection("bulletins")
-	bulletinboards = db.Database(db_name).Collection("bulletinboards")
 	// Session = db.Database("SessionDB").Collection("sessions")
 }
