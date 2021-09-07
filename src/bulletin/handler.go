@@ -42,3 +42,27 @@ func LikeBulletin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func UnlikeBulletin(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["bid"]
+	bid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+
+	user_obj, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	uid := user_obj.UserID
+
+	filter := bson.D{{"_id", bid}}
+	update := bson.D{{"$pull", bson.D{{"reactions", uid}}}}
+	_, err = db.UpdateBulletin(filter, update, false)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+}
