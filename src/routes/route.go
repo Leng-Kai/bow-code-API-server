@@ -97,7 +97,7 @@ func init() {
 	register("POST", "/bulletin/like/{bid}", bulletin.LikeBulletin, nil)
 	register("POST", "/bulletin/unlike/{bid}", bulletin.UnlikeBulletin, nil)
 	register("DELETE", "/bulletin/{crid}/{bid}", bulletin.DeleteBulletin, nil)
-	// register("PUT", "/bulletin/{bid}", bulletin.EditBulletin, nil)
+	register("PUT", "/bulletin/{bid}", bulletin.EditBulletin, nil)
 	
 	/* Healthy Check */
 	register("GET", "/", healthyCheck, nil)

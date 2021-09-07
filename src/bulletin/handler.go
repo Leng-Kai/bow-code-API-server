@@ -1,7 +1,7 @@
 package bulletin
 
 import (
-	// "encoding/json"
+	"encoding/json"
 	// "log"
 	"net/http"
 	// "strconv"
@@ -12,7 +12,7 @@ import (
 	"github.com/Leng-Kai/bow-code-API-server/db"
 	// "github.com/Leng-Kai/bow-code-API-server/schemas"
 	"github.com/Leng-Kai/bow-code-API-server/user"
-	// "github.com/Leng-Kai/bow-code-API-server/util"
+	"github.com/Leng-Kai/bow-code-API-server/util"
 
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
@@ -109,5 +109,55 @@ func DeleteBulletin(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), 404)
 		return
+	}
+}
+
+func EditBulletin(w http.ResponseWriter, r *http.Request) {
+	bid, err := primitive.ObjectIDFromHex(mux.Vars(r)["bid"])
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	filter := bson.D{{"_id", bid}}
+	sortby := bson.D{}
+	bulletin, err := db.GetSingleBulletin(filter, sortby)
+	if err != nil {
+		http.Error(w, "bulletin not found.", 404)
+		return
+	}
+
+	user_obj, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	uid := user_obj.UserID
+	if uid != bulletin.Creator {
+		http.Error(w, "permission denied. not bulletin creator.", 404)
+		return
+	}
+
+	body, err := util.GetBody(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	var updatedBulletin map[string]interface{}
+	err = json.Unmarshal(body, &updatedBulletin)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+
+	legal_key := []string{"title", "content"}
+	for key, value := range updatedBulletin {
+		if util.Contain_str(legal_key, key) {
+			update := bson.D{{"$set", bson.D{{key, value}}}}
+			_, err = db.UpdateBulletin(filter, update, false)
+			if err != nil {
+				http.Error(w, err.Error(), 401)
+				return
+			}
+		}
 	}
 }
