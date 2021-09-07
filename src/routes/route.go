@@ -3,7 +3,7 @@ package routes
 import (
 	"net/http"
 
-	// "github.com/Leng-Kai/bow-code-API-server/bulletin"
+	"github.com/Leng-Kai/bow-code-API-server/bulletin"
 	"github.com/Leng-Kai/bow-code-API-server/classroom"
 	"github.com/Leng-Kai/bow-code-API-server/course"
 	"github.com/Leng-Kai/bow-code-API-server/course_plan"
@@ -94,7 +94,7 @@ func init() {
 	// register("POST", "/bulletin/reply/{bid}/{index}", bulletin.ReplyToBulletin, nil)
 	// register("DELETE", "/bulletin/reply/{bid}/{index}", bulletin.DeleteReply, nil)
 	// register("PUT", "/bulletin/reply/{bid}/{index}", bulletin.EditReply, nil)
-	// register("POST", "bulletin/like/{bid}", bulletin.LikeBulletin, nil)
+	register("POST", "/bulletin/like/{bid}", bulletin.LikeBulletin, nil)
 	// register("POST", "bulletin/unlike/{bid}", bulletin.UnlikeBulletin, nil)
 	// register("DELETE", "/bulletin/{bid}", bulletin.DeleteBulletin, nil)
 	// register("PUT", "/bulletin/{bid}", bulletin.EditBulletin, nil)
