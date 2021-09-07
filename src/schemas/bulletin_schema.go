@@ -5,9 +5,9 @@ import (
 )
 
 type BulletinID = ID
-type BulletinBoardID = ID
 
 type Reply struct {
+	Index      int       `json:"index" bson:"index"`
 	Creator    UserID    `json:"creator" bson:"creator"`
 	Content    string    `json:"content" bson:"content"`
 	Reactions  []UserID  `json:"reactions" bson:"reactions"`
@@ -21,5 +21,6 @@ type Bulletin struct {
 	Content    string     `json:"content" bson:"content"`
 	Reactions  []UserID   `json:"reactions" bson:"reactions"`
 	Replies    []Reply    `json:"replies" bson:"replies"`
+	IndexCount int        `json:"indexCount" bson:"indexCount"`
 	CreateTime time.Time  `json:"createTime" bson:"createTime"`
 }

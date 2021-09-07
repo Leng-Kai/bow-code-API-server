@@ -23,7 +23,7 @@ type Classroom struct {
 	Apply        bool                 `json:"apply" bson:"apply"`
 	Applicants   []UserID             `json:"applicants" bson:"applicants"`
 	Invitees     []UserID             `json:"invitees" bson:"invitees"`
-	BulletinList []Bulletin           `json:"bulletinList" bson:"bulletinList"`
+	BulletinList []BulletinID         `json:"bulletinList" bson:"bulletinList"`
 	CourseList   []ClassroomComponent `json:"courseList" bson:"courseList"`
 	HomeworkList []ClassroomComponent `json:"homeworkList" bson:"homeworkList"`
 	ExamList     []ClassroomComponent `json:"examList" bson:"examList"`
