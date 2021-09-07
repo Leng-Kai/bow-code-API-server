@@ -175,11 +175,6 @@ func UnlikeBulletin(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteBulletin(w http.ResponseWriter, r *http.Request) {
-	crid, err := primitive.ObjectIDFromHex(mux.Vars(r)["crid"])
-	if err != nil {
-		http.Error(w, err.Error(), 401)
-		return
-	}
 	bid, err := primitive.ObjectIDFromHex(mux.Vars(r)["bid"])
 	if err != nil {
 		http.Error(w, err.Error(), 401)
@@ -192,6 +187,7 @@ func DeleteBulletin(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "bulletin not found.", 404)
 		return
 	}
+	crid := bulletin.Classroom
 
 	user_obj, err := user.GetSessionUser(r)
 	if err != nil {
