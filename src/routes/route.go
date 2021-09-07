@@ -87,7 +87,7 @@ func init() {
 	register("POST", "/classroom/{crid}", classroom.UpdateClassroomByID, nil)
 
 	register("POST", "/bulletin/{crid}", bulletin.CreateNewBulletin, nil)
-	// register("POST", "/bulletin/reply/like/{bid}/{index}", bulletin.LikeReply, nil)
+	register("POST", "/bulletin/reply/like/{bid}/{index}", bulletin.LikeReply, nil)
 	// register("POST", "/bulletin/reply/unlike/{bid}/{index}", bulletin.UnlikeReply, nil)
 	register("POST", "/bulletin/reply/{bid}", bulletin.ReplyToBulletin, nil)
 	// register("DELETE", "/bulletin/reply/{bid}/{index}", bulletin.DeleteReply, nil)
