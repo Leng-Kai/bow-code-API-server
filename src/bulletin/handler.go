@@ -226,6 +226,68 @@ func DeleteReply(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func EditReply(w http.ResponseWriter, r *http.Request) {
+	bid, err := primitive.ObjectIDFromHex(mux.Vars(r)["bid"])
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	index, err := strconv.Atoi(mux.Vars(r)["index"])
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	filter := bson.D{{"_id", bid}}
+	sortby := bson.D{}
+	bulletin, err := db.GetSingleBulletin(filter, sortby)
+	if err != nil {
+		http.Error(w, "bulletin not found.", 404)
+		return
+	}
+
+	user_obj, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	uid := user_obj.UserID
+
+	for _, reply := range bulletin.Replies {
+		if reply.Index == index {
+			if uid != reply.Creator {
+				http.Error(w, "permission denied. not reply creator.", 404)
+				return
+			}
+			break
+		}
+	}
+
+	body, err := util.GetBody(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	var updatedReply map[string]interface{}
+	err = json.Unmarshal(body, &updatedReply)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+
+	if newContent, ok := updatedReply["content"]; ok {
+		filter := bson.D{{"$and", []bson.D{
+			bson.D{{"_id", bid}},
+			bson.D{{"replies.index", index}},
+		}}}
+		update := bson.D{{"$set", bson.D{{"replies.$.content", newContent}}}}
+		_, err = db.UpdateBulletin(filter, update, false)
+		if err != nil {
+			http.Error(w, err.Error(), 401)
+			return
+		}
+	}
+}
+
 func LikeBulletin(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["bid"]
 	bid, err := primitive.ObjectIDFromHex(id)
