@@ -188,6 +188,44 @@ func ReplyToBulletin(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func DeleteReply(w http.ResponseWriter, r *http.Request) {
+	bid, err := primitive.ObjectIDFromHex(mux.Vars(r)["bid"])
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	index, err := strconv.Atoi(mux.Vars(r)["index"])
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	filter := bson.D{{"_id", bid}}
+	sortby := bson.D{}
+	bulletin, err := db.GetSingleBulletin(filter, sortby)
+	if err != nil {
+		http.Error(w, "bulletin not found.", 404)
+		return
+	}
+
+	user_obj, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	uid := user_obj.UserID
+	if uid != bulletin.Replies[index].Creator {
+		http.Error(w, "permission denied. not reply creator.", 404)
+		return
+	}
+
+	update := bson.D{{"$pull", bson.D{{"replies", bson.D{{"index", index}}}}}}
+	_, err = db.UpdateBulletin(filter, update, false)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+}
+
 func LikeBulletin(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["bid"]
 	bid, err := primitive.ObjectIDFromHex(id)
