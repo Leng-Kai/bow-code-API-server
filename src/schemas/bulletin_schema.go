@@ -16,6 +16,7 @@ type Reply struct {
 
 type Bulletin struct {
 	BulletinID BulletinID `json:"id" bson:"_id,omitempty"`
+	Classroom  ClassroomID `json:"classroom" bson:"classroom"`
 	Creator    UserID     `json:"creator" bson:"creator"`
 	Title      string     `json:"title" bson:"title"`
 	Content    string     `json:"content" bson:"content"`

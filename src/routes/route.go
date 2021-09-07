@@ -83,12 +83,10 @@ func init() {
 	register("POST", "/classroom/exam/{crid}", classroom.CreateExam, nil)
 	register("PUT", "/classroom/homework/{crid}/{No}", classroom.UpdateHomework, nil)
 	register("PUT", "/classroom/exam/{crid}/{No}", classroom.UpdateExam, nil)
-
-	register("POST", "/classroom/bulletin/{crid}", classroom.CreateBulletin, nil)
-
 	register("GET", "/classroom/{crid}", classroom.GetClassroomByID, nil)
 	register("POST", "/classroom/{crid}", classroom.UpdateClassroomByID, nil)
 
+	register("POST", "/bulletin/{crid}", bulletin.CreateNewBulletin, nil)
 	// register("POST", "/bulletin/reply/like/{bid}/{index}", bulletin.LikeReply, nil)
 	// register("POST", "/bulletin/reply/unlike/{bid}/{index}", bulletin.UnlikeReply, nil)
 	register("POST", "/bulletin/reply/{bid}", bulletin.ReplyToBulletin, nil)
