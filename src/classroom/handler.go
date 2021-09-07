@@ -805,3 +805,43 @@ func UpdateExam(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func GetBulletin(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["crid"]
+	crid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	filter := bson.D{{"_id", crid}}
+	sortby := bson.D{}
+	classroom, err := db.GetSingleClassroom(filter, sortby)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "classroom not found.", 404)
+		return
+	}
+
+	user_obj, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	uid := user_obj.UserID
+	if uid != classroom.Creator && !util.Contain_str(classroom.Students, uid) {
+		http.Error(w, "permission denied.", 401)
+		return
+	}
+
+	bulletinList := []schemas.Bulletin{}
+	for _, bulletinID := range classroom.BulletinList {
+		bulletin, err := db.GetSingleBulletin(bson.D{{"_id", bulletinID}}, bson.D{})
+		if err != nil {
+			http.Error(w, err.Error(), 401)
+			return
+		}
+		bulletinList = append(bulletinList, bulletin)
+	}
+
+	util.ResponseJSON(w, bulletinList)
+}
