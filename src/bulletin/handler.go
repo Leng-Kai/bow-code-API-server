@@ -213,9 +213,14 @@ func DeleteReply(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	uid := user_obj.UserID
-	if uid != bulletin.Replies[index].Creator {
-		http.Error(w, "permission denied. not reply creator.", 404)
-		return
+	for _, reply := range bulletin.Replies {
+		if reply.Index == index {
+			if uid != reply.Creator {
+				http.Error(w, "permission denied. not reply creator.", 404)
+				return
+			}
+			break
+		}
 	}
 
 	update := bson.D{{"$pull", bson.D{{"replies", bson.D{{"index", index}}}}}}
@@ -251,7 +256,6 @@ func EditReply(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	uid := user_obj.UserID
-
 	for _, reply := range bulletin.Replies {
 		if reply.Index == index {
 			if uid != reply.Creator {
