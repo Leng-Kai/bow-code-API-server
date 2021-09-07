@@ -111,6 +111,37 @@ func LikeReply(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func UnlikeReply(w http.ResponseWriter, r *http.Request) {
+	bid, err := primitive.ObjectIDFromHex(mux.Vars(r)["bid"])
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	index, err := strconv.Atoi(mux.Vars(r)["index"])
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+
+	user_obj, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	uid := user_obj.UserID
+
+	filter := bson.D{{"$and", []bson.D{
+		bson.D{{"_id", bid}},
+		bson.D{{"replies.index", index}},
+	}}}
+	update := bson.D{{"$pull", bson.D{{"replies.$.reactions", uid}}}}
+	_, err = db.UpdateBulletin(filter, update, false)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+}
+
 func ReplyToBulletin(w http.ResponseWriter, r *http.Request) {
 	bid, err := primitive.ObjectIDFromHex(mux.Vars(r)["bid"])
 	if err != nil {
