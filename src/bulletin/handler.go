@@ -6,11 +6,11 @@ import (
 	"net/http"
 	// "strconv"
 	// "strings"
-	// "time"
+	"time"
 
 	// . "github.com/Leng-Kai/bow-code-API-server/course_plan"
 	"github.com/Leng-Kai/bow-code-API-server/db"
-	// "github.com/Leng-Kai/bow-code-API-server/schemas"
+	"github.com/Leng-Kai/bow-code-API-server/schemas"
 	"github.com/Leng-Kai/bow-code-API-server/user"
 	"github.com/Leng-Kai/bow-code-API-server/util"
 
@@ -18,6 +18,52 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+func ReplyToBulletin(w http.ResponseWriter, r *http.Request) {
+	bid, err := primitive.ObjectIDFromHex(mux.Vars(r)["bid"])
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	filter := bson.D{{"_id", bid}}
+	update := bson.D{{"$inc", bson.D{{"indexCount", 1}}}}
+	oldBulletin, err := db.UpdateBulletin(filter, update, false)
+	if err != nil {
+		http.Error(w, "bulletin not found.", 404)
+		return
+	}
+	index := oldBulletin.IndexCount
+
+	user_obj, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	uid := user_obj.UserID
+
+	body, err := util.GetBody(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	newReply := schemas.Reply{}
+	err = json.Unmarshal(body, &newReply)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	newReply.Creator = uid
+	newReply.Reactions = []schemas.UserID{}
+	newReply.Index = index
+	newReply.CreateTime = time.Now()
+
+	update = bson.D{{"$addToSet", bson.D{{"replies", newReply}}}}
+	_, err = db.UpdateBulletin(filter, update, false)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+}
 
 func LikeBulletin(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["bid"]
