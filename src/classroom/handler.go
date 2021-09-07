@@ -457,14 +457,50 @@ func GetStudentScores(w http.ResponseWriter, r *http.Request) {
 	}
 
 	scoreEntryList := classroomRecord.ScoreEntryList
-	scoreEntries := []schemas.ScoreEntry{}
+	// scoreEntries := []schemas.ScoreEntry{}
+	problemScore := map[schemas.ProblemID]int{}
 	for _, scoreEntry := range scoreEntryList {
 		if scoreEntry.UserID == uid_student {
-			scoreEntries = append(scoreEntries, scoreEntry)
+			// scoreEntries = append(scoreEntries, scoreEntry)
+			problemScore[scoreEntry.ProblemID] = scoreEntry.Score
 		}
 	}
 
-	util.ResponseJSON(w, scoreEntries)
+	homeworkList := classroom.HomeworkList
+	homeworkComponentScoreList := []schemas.ComponentScore{}
+	for _, homework := range homeworkList {
+		setScoreList := []schemas.SetScore{}
+		for _, set := range homework.Component.SetList {
+			score := -1
+			if s, exist := problemScore[set.ID]; exist {
+				score = s
+			}
+			setScoreList = append(setScoreList, schemas.SetScore{Name: set.Name, Score: score})
+		}
+		componentScore := schemas.ComponentScore{Name: homework.Component.Name, SetScoreList: setScoreList}
+		homeworkComponentScoreList = append(homeworkComponentScoreList, componentScore)
+	}
+
+	examList := classroom.ExamList
+	examComponentScoreList := []schemas.ComponentScore{}
+	for _, exam := range examList {
+		setScoreList := []schemas.SetScore{}
+		for _, set := range exam.Component.SetList {
+			score := -1
+			if s, exist := problemScore[set.ID]; exist {
+				score = s
+			}
+			setScoreList = append(setScoreList, schemas.SetScore{Name: set.Name, Score: score})
+		}
+		componentScore := schemas.ComponentScore{Name: exam.Component.Name, SetScoreList: setScoreList}
+		examComponentScoreList = append(examComponentScoreList, componentScore)
+	}
+
+	resp := struct {
+		HomeworkComponentScoreList []schemas.ComponentScore `json:"homeworkComponentScoreList"`
+		ExamComponentScoreList     []schemas.ComponentScore `json:"examComponentScoreList"`
+	}{HomeworkComponentScoreList: homeworkComponentScoreList, ExamComponentScoreList: examComponentScoreList}
+	util.ResponseJSON(w, resp)
 }
 
 func CreateHomework(w http.ResponseWriter, r *http.Request) {
