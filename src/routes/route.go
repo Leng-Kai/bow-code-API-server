@@ -72,6 +72,7 @@ func init() {
 	register("POST", "/classroom", classroom.CreateNewClassroom, nil)
 	register("POST", "/classroom/apply/{crid}", classroom.ApplyForClassroom, nil) 
 	register("POST", "/classroom/accept/{crid}/{uid}", classroom.AcceptApplication, nil)
+	register("POST", "/classroom/reject/{crid}/{uid}", classroom.RejectApplication, nil)
 	register("POST", "/classroom/invite/{crid}/{uid}", classroom.InviteStudent, nil)
 	register("POST", "/classroom/join/{crid}", classroom.JoinClassroom, nil)
 	register("GET", "/classroom/status/{crid}", classroom.GetClassroomStatus, nil)
