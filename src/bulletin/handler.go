@@ -19,6 +19,22 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+func GetBulletin(w http.ResponseWriter, r *http.Request) {
+	bid, err := primitive.ObjectIDFromHex(mux.Vars(r)["bid"])
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+
+	bulletin, err := db.GetSingleBulletin(bson.D{{"_id", bid}}, bson.D{})
+	if err != nil {
+		http.Error(w, "bulletin not found.", 404)
+		return
+	}
+
+	util.ResponseJSON(w, bulletin)
+}
+
 func CreateNewBulletin(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["crid"]
 	crid, err := primitive.ObjectIDFromHex(id)

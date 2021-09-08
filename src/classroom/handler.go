@@ -806,7 +806,7 @@ func UpdateExam(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetBulletin(w http.ResponseWriter, r *http.Request) {
+func GetAllBulletins(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["crid"]
 	crid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
