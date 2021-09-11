@@ -79,7 +79,7 @@ func init() {
 	register("POST", "/classroom/join/{crid}", classroom.JoinClassroom, nil)
 	register("GET", "/classroom/status/{crid}", classroom.GetClassroomStatus, nil)
 	register("GET", "/classroom/record/{crid}", classroom.GetClassroomRecord, nil)
-	register("GET", "/classroom/score/{crid}/{uid}", classroom.GetStudentScores, nil)
+	register("GET", "/classroom/score/student/{crid}/{uid}", classroom.GetStudentScores, nil)
 	register("POST", "/classroom/homework/{crid}", classroom.CreateHomework, nil)
 	register("POST", "/classroom/exam/{crid}", classroom.CreateExam, nil)
 	register("PUT", "/classroom/homework/{crid}/{No}", classroom.UpdateHomework, nil)
