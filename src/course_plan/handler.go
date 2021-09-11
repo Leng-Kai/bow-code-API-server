@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 	// "strconv"
-	// "strings"
+	"strings"
 	"time"
 
 	"github.com/Leng-Kai/bow-code-API-server/db"
@@ -81,6 +81,31 @@ func CreateNewCoursePlan(w http.ResponseWriter, r *http.Request) {
 	resp := struct {
 		CoursePlanID schemas.ID
 	}{CoursePlanID: id}
+	util.ResponseJSON(w, resp)
+}
+
+func GetMultipleCoursePlans(w http.ResponseWriter, r *http.Request) {
+	coursePlans := r.URL.Query().Get("courseplans")
+	coursePlanIDList_str := strings.Split(coursePlans, ",")
+	coursePlanIDList := []schemas.CoursePlanID{}
+	for _, coursePlanID_str := range coursePlanIDList_str {
+		coursePlanID_objID, err := primitive.ObjectIDFromHex(coursePlanID_str)
+		if err != nil {
+			http.Error(w, err.Error(), 401)
+			return
+		}
+		coursePlanIDList = append(coursePlanIDList, coursePlanID_objID)
+	}
+
+	coursePlanList := []schemas.CoursePlan{}
+	for _, cpid := range coursePlanIDList {
+		coursePlan, _ := db.GetSingleCoursePlan(bson.D{{"_id", cpid}}, bson.D{})
+		coursePlanList = append(coursePlanList, coursePlan)
+	}
+
+	resp := struct {
+		CoursePlanList []schemas.CoursePlan `json:"coursePlanList"`
+	}{CoursePlanList: coursePlanList}
 	util.ResponseJSON(w, resp)
 }
 

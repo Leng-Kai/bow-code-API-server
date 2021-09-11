@@ -47,8 +47,9 @@ func init() {
 	register("POST", "/course/{id}/favorite", course.LoveCourseByID, nil)
 
 	/* CoursePlan */
-	register("GET", "/course_plan", course_plan.GetCoursePlans, nil)
+	// register("GET", "/course_plan", course_plan.GetCoursePlans, nil)
 	register("POST", "/course_plan", course_plan.CreateNewCoursePlan, nil)
+	register("GET", "/course_plan/multiple", course_plan.GetMultipleCoursePlans, nil)
 	register("GET", "/course_plan/{cpid}", course_plan.GetCoursePlanByID, nil)
 	register("POST", "/course_plan/{cpid}", course_plan.UpdateCoursePlanByID, nil)
 
