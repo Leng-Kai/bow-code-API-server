@@ -202,16 +202,16 @@ func ReceiveJudgeResult_Classroom(w http.ResponseWriter, r *http.Request) {
 	_, err = db.UpdateSubmission(filter, update, false)
 
 	update = bson.D{{"$inc", bson.D{{"judgementCompleted", 1}}}}
-	_, err = db.UpdateSubmission(filter, update, false)
+	unupdatedSubmission, err := db.UpdateSubmission(filter, update, false)
 
 	update = bson.D{{"$bit", bson.D{{"status", bson.D{{"or", Status2Flag[result.Status.ID]}}}}}}
 	_, err = db.UpdateSubmission(filter, update, false)
 
-	sortby := bson.D{}
-	submission, err := db.GetSingleSubmission(filter, sortby)
-	if submission.JudgementCompleted < submission.TestcaseCnt {
+	if unupdatedSubmission.JudgementCompleted + 1 < unupdatedSubmission.TestcaseCnt {
 		return
 	}
+	sortby := bson.D{}
+	submission, err := db.GetSingleSubmission(filter, sortby)
 
 	problem, _ := db.GetSingleProblem(bson.D{{"_id", submission.Problem}}, bson.D{})
 	score := 0
