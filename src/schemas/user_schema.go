@@ -9,6 +9,7 @@ type UserInfo struct {
 }
 
 type SchoolInfo struct {
+	Complete    bool   `json:"complete" bson:"complete"`
 	SchoolName  string `json:"schoolName" bson:"schoolName"`
 	StudentID   string `json:"studentID" bson:"studentID"`
 	StudentName string `json:"studentName" bson:"studentName"`
@@ -17,12 +18,11 @@ type SchoolInfo struct {
 }
 
 type User struct {
-	UserID              UserID     `json:"id" bson:"_id,omitempty"`
-	RegisterType        string     `json:"registerType" bson:"registerType"`
-	UserInfo            UserInfo   `json:"userInfo" bson:"userInfo"`
-	SchoolInfo          SchoolInfo `json:"schoolInfo" bson:"schoolInfo"`
-	SchoolInfoCompleted bool       `json:"schoolInfoCompleted" bson:"schoolInfoCompleted"`
-	Super               bool       `json:"super" bson:"super"`
+	UserID       UserID     `json:"id" bson:"_id,omitempty"`
+	RegisterType string     `json:"registerType" bson:"registerType"`
+	UserInfo     UserInfo   `json:"userInfo" bson:"userInfo"`
+	SchoolInfo   SchoolInfo `json:"schoolInfo" bson:"schoolInfo"`
+	Super        bool       `json:"super" bson:"super"`
 
 	JoinedCourseList   []CourseID `json:"joinedCourseList" bson:"joinedCourseList"`
 	OwnCourseList      []CourseID `json:"ownCourseList" bson:"ownCourseList"`

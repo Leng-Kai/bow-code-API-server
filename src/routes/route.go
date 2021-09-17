@@ -29,6 +29,7 @@ func init() {
 	register("POST", "/logout", user.Logout, nil)
 	register("GET", "/auth", user.AuthSession, nil)
 	register("GET", "/user/{id}", user.GetUserByID, nil)
+	register("PUT", "/user/school", user.UpdateSchoolInfo, nil)
 	register("PUT", "/user/{id}", user.UpdateUserByID, nil)
 
 	/* Course */

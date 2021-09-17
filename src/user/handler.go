@@ -64,8 +64,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		UserID:               global_uid,
 		RegisterType:         method,
 		UserInfo:             userInfo,
-		SchoolInfo:           schemas.SchoolInfo{},
-		SchoolInfoCompleted:  false,
+		SchoolInfo:           schemas.SchoolInfo{ Complete: false },
 		Super:                false,
 		JoinedCourseList:     []schemas.CourseID{},
 		OwnCourseList:        []schemas.CourseID{},
@@ -231,6 +230,33 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	util.ResponseJSON(w, user)
+}
+
+func UpdateSchoolInfo(w http.ResponseWriter, r *http.Request) {
+	body, err := util.GetBody(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	newSchoolInfo := schemas.SchoolInfo{}
+	err = json.Unmarshal(body, &newSchoolInfo)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	newSchoolInfo.Complete = true
+	user_obj, err := GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	uid := user_obj.UserID
+
+	_, err = db.UpdateUser(bson.D{{"_id", uid}}, bson.D{{"$set", bson.D{{"schoolInfo", newSchoolInfo}}}}, false)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
 }
 
 func UpdateUserByID(w http.ResponseWriter, r *http.Request) {
