@@ -221,15 +221,6 @@ func ReceiveJudgeResult_Classroom(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	filter = bson.D{{"_id", crid}}
-	update = bson.D{{"$addToSet", bson.D{{"scoreEntryList", schemas.ScoreEntry{UserID: submission.Creator, ProblemID: submission.Problem}}}}}
-	_, err = db.UpdateClassroomRecord(filter, update, false)
-	if err != nil {
-		// failed to update score entry
-		log.Println(err)
-		return
-	}
-
 	filter = bson.D{{"$and", []bson.D{
 		bson.D{{"_id", crid}},
 		// bson.D{{"scoreEntryList", bson.D{{"$and", []bson.D{
@@ -243,6 +234,15 @@ func ReceiveJudgeResult_Classroom(w http.ResponseWriter, r *http.Request) {
 	_, err = db.UpdateClassroomRecord(filter, update, false)
 	if err != nil {
 		// failed to update score
+		log.Println(err)
+		return
+	}
+
+	filter = bson.D{{"_id", crid}}
+	update = bson.D{{"$addToSet", bson.D{{"scoreEntryList", schemas.ScoreEntry{UserID: submission.Creator, ProblemID: submission.Problem, Score: score}}}}}
+	_, err = db.UpdateClassroomRecord(filter, update, false)
+	if err != nil {
+		// failed to update score entry
 		log.Println(err)
 		return
 	}
