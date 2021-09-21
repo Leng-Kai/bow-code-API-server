@@ -24,6 +24,7 @@ type Course struct {
 	CourseID  ID     `json:"id" bson:"_id,omitempty"`
 	Name      string `json:"name" bson:"name"`
 	Abstract  string `json:"abstract" bson:"abstract"`
+	Image     string `json:"image" bson:"image"`
 	BlockList []struct {
 		Type  string `json:"type"`
 		Title string `json:"title"`
