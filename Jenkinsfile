@@ -12,6 +12,7 @@ pipeline {
     	stage('Clone') {
             steps {
                 echo 'Cloning..'
+                sh "rm -rf ./bow-code-API-server"
                 sh "rm -rf ./bow-code-API-server-main"
                 sh "git clone $GITHUB_REPO_URL"
                 sh "mv bow-code-API-server bow-code-API-server-main"
