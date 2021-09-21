@@ -1,0 +1,2 @@
+docker-compose.yaml merge=preserve
+Jenkinsfile merge=preserve
