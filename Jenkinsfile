@@ -12,18 +12,18 @@ pipeline {
     	stage('Clone') {
             steps {
                 echo 'Cloning..'
-                sh "mkdir dev"
-                dir("dev") {
-                    sh "rm -rf ./bow-code-API-server"
-                    sh "git clone $GITHUB_REPO_URL"
-                }
+                sh "rm -rf ./bow-code-API-server"
+                sh "rm -rf ./bow-code-API-server-dev"
+                sh "git clone $GITHUB_REPO_URL"
+                sh "mv bow-code-API-server bow-code-API-server-dev"
+                sh "ls"
             }
         }
     
         stage('Build') {
             steps {
                 echo 'Building..'
-                dir("dev/bow-code-API-server") {
+                dir("bow-code-API-server-dev") {
                     sh "git checkout dev"
                     sh "docker-compose up --force-recreate --build -d"
                     sh "docker image prune -f"
