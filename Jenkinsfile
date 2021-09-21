@@ -14,6 +14,7 @@ pipeline {
                 echo 'Cloning..'
                 sh "rm -rf ./bow-code-API-server"
                 sh "git clone $GITHUB_REPO_URL"
+                sh "echo \"test\""
             }
         }
     
