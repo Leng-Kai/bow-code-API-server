@@ -3,7 +3,7 @@ package submit
 import (
 	"fmt"
 	"encoding/json"
-	"log"
+	// "log"
 	"os"
 
 	. "github.com/Leng-Kai/bow-code-API-server/schemas"
