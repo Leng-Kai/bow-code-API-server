@@ -20,7 +20,7 @@ services:
     environment:
       DB_URL: mongodb://root:root@db:27017
       SELF_URL: http://bow-code.ntu.im/api-server
-      JUDGE0_URL: http://bow-code.ntu.im/judge0
+      JUDGE0_URL: http://localhost/judge0
       DOCS_PATH: /data/content
       PORT: 8088
       SESSION_KEY: pekora
