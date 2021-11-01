@@ -2,7 +2,10 @@ package submit
 
 import (
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
 	"net/http"
 	"strconv"
 	"time"
@@ -94,9 +97,14 @@ func ReceiveJudgeResult(w http.ResponseWriter, r *http.Request) {
 	body, err := util.GetBody(r)
 	result := schemas.Result{}
 	_ = json.Unmarshal(body, &result)
+	
+	url := fmt.Sprintf("%s/%s/%s?fields=stdin,expected_output,stdout,time,memory,stderr,token,compile_output,message,status", os.Getenv("JUDGE0_URL"), "submissions", result.Token)
+	resp, err := http.Get(url)
+	body, err = ioutil.ReadAll(resp.Body)
+	_ = json.Unmarshal(body, &result)
 
 	newJudgement := schemas.Judgement{
-		TestcaseNo: caseNo, Token: result.Token, Status: result.Status.ID,
+		TestcaseNo: caseNo, Input: result.Stdin, Expected_output: result.Expected_output, Output: result.Stdout, Token: result.Token, Status: result.Status.ID,
 	}
 
 	filter := bson.D{{"_id", sid}}
