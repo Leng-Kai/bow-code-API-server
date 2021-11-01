@@ -104,8 +104,16 @@ func ReceiveJudgeResult(w http.ResponseWriter, r *http.Request) {
 	_ = json.Unmarshal(body, &result)
 
 	newJudgement := schemas.Judgement{
-		TestcaseNo: caseNo, Input: result.Stdin, Expected_output: result.Expected_output, Output: result.Stdout, Token: result.Token, Status: result.Status.ID,
+		TestcaseNo: caseNo, Input: result.Stdin, Output: result.Stdout, Token: result.Token, Status: result.Status.ID,
 	}
+	showDetail := r.URL.Query().Get("show_detail")
+	if showDetail == "1" {
+		newJudgement.Expected_output = result.Expected_output
+	}
+
+	// newJudgement := schemas.Judgement{
+	// 	TestcaseNo: caseNo, Input: result.Stdin, Expected_output: result.Expected_output, Output: result.Stdout, Token: result.Token, Status: result.Status.ID,
+	// }
 
 	filter := bson.D{{"_id", sid}}
 	update := bson.D{{"$push", bson.D{{"judgements", newJudgement}}}}

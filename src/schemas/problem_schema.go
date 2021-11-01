@@ -11,6 +11,7 @@ type Testcase struct {
 	Input          []string `json:"input" bson:"input"`
 	ExpectedOutput []string `json:"expectedOutput" bson:"expectedOutput"`
 	Score          []int    `json:"score" bson:"score"`
+	ShowDetail     []bool   `json:"showDetail" bson:"showDetail"`
 }
 
 type Problem struct {
