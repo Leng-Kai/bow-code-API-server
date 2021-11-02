@@ -140,6 +140,7 @@ func GetProblems(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 404)
 		return
 	}
+	log.Println(problems)
 
 	tagsCounter := map[string]int{}
 	for _, problem := range problems {

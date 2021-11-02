@@ -32,6 +32,7 @@ func SendJudgeRequests(problem Problem, us UserSubmission, sid SubmissionID, cri
 
 	inputs := problem.Testcase.Input
 	outputs := problem.Testcase.ExpectedOutput
+	showDetails := problem.Testcase.ShowDetail
 
 	for i, _ := range inputs {
 		stdin := inputs[i]
@@ -39,6 +40,9 @@ func SendJudgeRequests(problem Problem, us UserSubmission, sid SubmissionID, cri
 		callback_url := fmt.Sprintf("%s/submit/%s/%d", self_url, sid.Hex(), i)
 		if len(crid) > 0 {
 			callback_url = fmt.Sprintf("%s/submit/%s/%s/%d", self_url, crid, sid.Hex(), i)
+		}
+		if showDetails[i] {
+			callback_url += "?show_detail=1"
 		}
 		url := fmt.Sprintf("%s/%s", os.Getenv("JUDGE0_URL"), "submissions")
 		body := judgeRequest{

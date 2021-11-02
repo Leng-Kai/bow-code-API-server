@@ -104,8 +104,16 @@ func ReceiveJudgeResult(w http.ResponseWriter, r *http.Request) {
 	_ = json.Unmarshal(body, &result)
 
 	newJudgement := schemas.Judgement{
-		TestcaseNo: caseNo, Input: result.Stdin, Expected_output: result.Expected_output, Output: result.Stdout, Token: result.Token, Status: result.Status.ID,
+		TestcaseNo: caseNo, Input: result.Stdin, Output: result.Stdout, Token: result.Token, Status: result.Status.ID,
 	}
+	showDetail := r.URL.Query().Get("show_detail")
+	if showDetail == "1" {
+		newJudgement.Expected_output = result.Expected_output
+	}
+
+	// newJudgement := schemas.Judgement{
+	// 	TestcaseNo: caseNo, Input: result.Stdin, Expected_output: result.Expected_output, Output: result.Stdout, Token: result.Token, Status: result.Status.ID,
+	// }
 
 	filter := bson.D{{"_id", sid}}
 	update := bson.D{{"$push", bson.D{{"judgements", newJudgement}}}}
@@ -201,8 +209,17 @@ func ReceiveJudgeResult_Classroom(w http.ResponseWriter, r *http.Request) {
 	result := schemas.Result{}
 	_ = json.Unmarshal(body, &result)
 
+	url := fmt.Sprintf("%s/%s/%s?fields=stdin,expected_output,stdout,time,memory,stderr,token,compile_output,message,status", os.Getenv("JUDGE0_URL"), "submissions", result.Token)
+	resp, err := http.Get(url)
+	body, err = ioutil.ReadAll(resp.Body)
+	_ = json.Unmarshal(body, &result)
+
 	newJudgement := schemas.Judgement{
-		TestcaseNo: caseNo, Token: result.Token, Status: result.Status.ID,
+		TestcaseNo: caseNo, Input: result.Stdin, Output: result.Stdout, Token: result.Token, Status: result.Status.ID,
+	}
+	showDetail := r.URL.Query().Get("show_detail")
+	if showDetail == "1" {
+		newJudgement.Expected_output = result.Expected_output
 	}
 
 	filter := bson.D{{"_id", sid}}
@@ -239,19 +256,19 @@ func ReceiveJudgeResult_Classroom(w http.ResponseWriter, r *http.Request) {
 		bson.D{{"scoreEntryList.problemID", submission.Problem}},
 	}}}
 	update = bson.D{{"$max", bson.D{{"scoreEntryList.$.score", score}}}}
-	_, err = db.UpdateClassroomRecord(filter, update, false)
-	if err != nil {
-		// failed to update score
-		log.Println(err)
-		return
-	}
+	_, err = db.UpdateClassroomRecord(filter, update, true)
+	// if err != nil {
+	// 	// failed to update score
+	// 	log.Println("ba", err)
+	// 	return
+	// }
 
 	filter = bson.D{{"_id", crid}}
 	update = bson.D{{"$addToSet", bson.D{{"scoreEntryList", schemas.ScoreEntry{UserID: submission.Creator, ProblemID: submission.Problem, Score: score}}}}}
 	_, err = db.UpdateClassroomRecord(filter, update, false)
 	if err != nil {
 		// failed to update score entry
-		log.Println(err)
+		log.Println("dc", err)
 		return
 	}
 }
