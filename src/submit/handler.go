@@ -209,8 +209,17 @@ func ReceiveJudgeResult_Classroom(w http.ResponseWriter, r *http.Request) {
 	result := schemas.Result{}
 	_ = json.Unmarshal(body, &result)
 
+	url := fmt.Sprintf("%s/%s/%s?fields=stdin,expected_output,stdout,time,memory,stderr,token,compile_output,message,status", os.Getenv("JUDGE0_URL"), "submissions", result.Token)
+	resp, err := http.Get(url)
+	body, err = ioutil.ReadAll(resp.Body)
+	_ = json.Unmarshal(body, &result)
+
 	newJudgement := schemas.Judgement{
-		TestcaseNo: caseNo, Token: result.Token, Status: result.Status.ID,
+		TestcaseNo: caseNo, Input: result.Stdin, Output: result.Stdout, Token: result.Token, Status: result.Status.ID,
+	}
+	showDetail := r.URL.Query().Get("show_detail")
+	if showDetail == "1" {
+		newJudgement.Expected_output = result.Expected_output
 	}
 
 	filter := bson.D{{"_id", sid}}
