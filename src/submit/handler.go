@@ -256,19 +256,19 @@ func ReceiveJudgeResult_Classroom(w http.ResponseWriter, r *http.Request) {
 		bson.D{{"scoreEntryList.problemID", submission.Problem}},
 	}}}
 	update = bson.D{{"$max", bson.D{{"scoreEntryList.$.score", score}}}}
-	_, err = db.UpdateClassroomRecord(filter, update, false)
-	if err != nil {
-		// failed to update score
-		log.Println(err)
-		return
-	}
+	_, err = db.UpdateClassroomRecord(filter, update, true)
+	// if err != nil {
+	// 	// failed to update score
+	// 	log.Println("ba", err)
+	// 	return
+	// }
 
 	filter = bson.D{{"_id", crid}}
 	update = bson.D{{"$addToSet", bson.D{{"scoreEntryList", schemas.ScoreEntry{UserID: submission.Creator, ProblemID: submission.Problem, Score: score}}}}}
 	_, err = db.UpdateClassroomRecord(filter, update, false)
 	if err != nil {
 		// failed to update score entry
-		log.Println(err)
+		log.Println("dc", err)
 		return
 	}
 }
