@@ -84,6 +84,19 @@ func CreateNewCoursePlan(w http.ResponseWriter, r *http.Request) {
 	util.ResponseJSON(w, resp)
 }
 
+func GetAllCoursePlans(w http.ResponseWriter, r *http.Request) {
+	filter := bson.D{{"visibility", 1}}
+	sortby := bson.D{}
+	coursePlans, err := db.GetMultipleCoursePlans(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "course plan not found.", 404)
+		return
+	}
+	util.ResponseJSON(w, coursePlans)
+}
+
 func GetMultipleCoursePlans(w http.ResponseWriter, r *http.Request) {
 	coursePlans := r.URL.Query().Get("courseplans")
 	coursePlanIDList_str := strings.Split(coursePlans, ",")
