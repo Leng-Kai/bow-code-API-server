@@ -22,6 +22,6 @@ services:
       SELF_URL: https://bow-code.ntu.im/api-server-dev
       JUDGE0_URL: https://bow-code.ntu.im/judge0
       DOCS_PATH: /data/content
-      PORT: 8088
+      PORT: 8089
       SESSION_KEY: pekora
       GOOGLE_CLIENT_ID: 125021518011-3omjnghuvlrmv64tb45v380bo0j1iu20.apps.googleusercontent.com
