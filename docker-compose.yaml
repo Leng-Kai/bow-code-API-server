@@ -4,7 +4,7 @@ services:
   db:
     image: mongo:4.4
     ports: 
-      - 27019:27017
+      - 27029:27017
     volumes:
       - ../db/data:/data/db
     environment: 
@@ -18,7 +18,7 @@ services:
     ports: 
       - 8089:8088
     environment:
-      DB_URL: mongodb://root:root@db:27019
+      DB_URL: mongodb://root:root@db:27029
       SELF_URL: https://bow-code.ntu.im/api-server-dev
       JUDGE0_URL: https://bow-code.ntu.im/judge0
       DOCS_PATH: /data/content
