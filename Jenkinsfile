@@ -24,6 +24,7 @@ pipeline {
             steps {
                 echo 'Building..'
                 dir("bow-code-API-server-dev") {
+                    sh "git checkout dev"
                     sh "docker-compose up --force-recreate --build -d"
                     sh "docker image prune -f"
                 }
