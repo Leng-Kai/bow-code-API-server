@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	// "strconv"
+	"os"
+	"path"
 	"strings"
 	"time"
 
@@ -119,6 +121,111 @@ func GetMultipleCoursePlans(w http.ResponseWriter, r *http.Request) {
 	resp := struct {
 		CoursePlanList []schemas.CoursePlan `json:"coursePlanList"`
 	}{CoursePlanList: coursePlanList}
+	util.ResponseJSON(w, resp)
+}
+
+func DuplicateCoursePlan(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["cpid"]
+	objId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		// invalid id format
+		log.Println(err)
+		return
+	}
+	filter := bson.D{{"_id", objId}}
+	sortby := bson.D{}
+	coursePlan, err := db.GetSingleCoursePlan(filter, sortby)
+	if err != nil {
+		// db error
+		log.Println(err)
+		http.Error(w, "course plan not found.", 404)
+		return
+	}
+
+	user_obj, err := user.GetSessionUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 401)
+		return
+	}
+	uid := user_obj.UserID
+
+	log.Println("1")
+
+	newCoursePlan := schemas.CoursePlan{ 
+		Name: coursePlan.Name,
+		Creator: uid,
+		Visibility: coursePlan.Visibility,
+	}
+
+	newComponentList := []schemas.CoursePlanComponent{}
+	for _, component := range coursePlan.ComponentList {
+		if component.Type != COURSE {
+			newComponentList = append(newComponentList, component)
+		} else {
+			newComponent := schemas.CoursePlanComponent{
+				Name: component.Name,
+				Type: component.Type,
+			}
+			newSetList := []schemas.Set{}
+			for _, set := range component.SetList{
+				newSet := schemas.Set{
+					Name: set.Name,
+					TotalScore: set.TotalScore,
+				}
+				course, _ := db.GetSingleCourse(bson.D{{"_id", set.ID}}, bson.D{})
+				newCourse := schemas.Course{
+					Name: course.Name,
+					Abstract: course.Abstract,
+					Image: course.Image,
+					BlockList: course.BlockList,
+					Creator: uid,
+					Tags: course.Tags,
+					Difficulty: course.Difficulty,
+					Category: course.Category,
+					IsPublic: course.IsPublic,
+					CreateTime: time.Now(),
+					Views: 0,
+				}
+
+				newCourseID, err := db.CreateCourse(newCourse)
+				if err != nil {
+					log.Println(err)
+					http.Error(w, "Error duplicating course.", 404)
+					return
+				}
+
+				docsPath := os.Getenv("DOCS_PATH")
+				err = util.CopyFiles(path.Join(docsPath, "course", set.ID.String(), "block"), path.Join(docsPath, "course", newCourseID.String(), "block"))
+				if err != nil {
+					log.Println(err)
+					http.Error(w, "Error copying files.", 404)
+					return
+				}
+
+				newSet.ID = newCourseID
+				newSetList = append(newSetList, newSet)
+			}
+			newComponent.SetList = newSetList
+			newComponentList = append(newComponentList, newComponent)
+		}
+	}
+	newCoursePlan.ComponentList = newComponentList
+	newCoursePlan.CreateTime = time.Now()
+
+	log.Println("2")
+
+	newCoursePlanID, err := db.CreateCoursePlan(newCoursePlan)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Error duplicating course plan.", 404)
+		return
+	}
+
+	log.Println("3")
+
+	resp := struct {
+		CoursePlanID schemas.ID
+	}{CoursePlanID: newCoursePlanID}
 	util.ResponseJSON(w, resp)
 }
 
