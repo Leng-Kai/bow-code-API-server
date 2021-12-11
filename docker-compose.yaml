@@ -18,7 +18,7 @@ services:
     ports: 
       - 8089:8088
     environment:
-      DB_URL: mongodb://root:root@localhost:27029
+      DB_URL: mongodb://root:root@db:27017
       SELF_URL: https://bow-code.ntu.im/api-server-dev
       JUDGE0_URL: https://bow-code.ntu.im/judge0
       DOCS_PATH: /data/content
