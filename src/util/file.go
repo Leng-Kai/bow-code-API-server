@@ -9,6 +9,8 @@ import (
 func CopyFiles(dir_src string, dir_dest string) error {
 	log.Println(dir_src, dir_dest)
 
+	os.MkdirAll(dir_dest, 0777)
+
 	source, err := os.Open(dir_src)
 	if err != nil {
 		return err
