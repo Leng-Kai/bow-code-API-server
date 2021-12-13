@@ -30,7 +30,6 @@ func CopyFiles(dir_src string, dir_dest string) error {
 
 	files, err := ioutil.ReadDir(dir_src)
 	for _, file := range files {
-		log.Println(path.Join(dir_src, file.Name(), "index.html"))
 		file_src, err := os.Open(path.Join(dir_src, file.Name(), "index.html"))
 		if err != nil {
 			return err

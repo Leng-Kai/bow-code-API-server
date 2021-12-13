@@ -192,6 +192,13 @@ func DuplicateCoursePlan(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 
+				_, err = db.UpdateUser(bson.D{{"_id", uid}}, bson.D{{"$push", bson.D{{"ownCourseList", newCourseID}}}}, true)
+				if err != nil {
+					log.Println(err)
+					http.Error(w, "Error updating ownCourseList.", 404)
+					return
+				}
+
 				docsPath := os.Getenv("DOCS_PATH")
 				err = util.CopyFiles(path.Join(docsPath, "course", set.ID.Hex(), "block"), path.Join(docsPath, "course", newCourseID.Hex(), "block"))
 				if err != nil {
@@ -214,6 +221,13 @@ func DuplicateCoursePlan(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Error duplicating course plan.", 404)
+		return
+	}
+
+	_, err = db.UpdateUser(bson.D{{"_id", uid}}, bson.D{{"$push", bson.D{{"ownCoursePlanList", newCoursePlanID}}}}, true)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Error updating ownCoursePlanList.", 404)
 		return
 	}
 
