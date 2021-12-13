@@ -149,8 +149,6 @@ func DuplicateCoursePlan(w http.ResponseWriter, r *http.Request) {
 	}
 	uid := user_obj.UserID
 
-	log.Println("1")
-
 	newCoursePlan := schemas.CoursePlan{ 
 		Name: coursePlan.Name,
 		Creator: uid,
@@ -195,7 +193,7 @@ func DuplicateCoursePlan(w http.ResponseWriter, r *http.Request) {
 				}
 
 				docsPath := os.Getenv("DOCS_PATH")
-				err = util.CopyFiles(path.Join(docsPath, "course", set.ID.String(), "block"), path.Join(docsPath, "course", newCourseID.String(), "block"))
+				err = util.CopyFiles(path.Join(docsPath, "course", set.ID.Hex(), "block"), path.Join(docsPath, "course", newCourseID.Hex(), "block"))
 				if err != nil {
 					log.Println(err)
 					http.Error(w, "Error copying files.", 404)
@@ -212,16 +210,12 @@ func DuplicateCoursePlan(w http.ResponseWriter, r *http.Request) {
 	newCoursePlan.ComponentList = newComponentList
 	newCoursePlan.CreateTime = time.Now()
 
-	log.Println("2")
-
 	newCoursePlanID, err := db.CreateCoursePlan(newCoursePlan)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Error duplicating course plan.", 404)
 		return
 	}
-
-	log.Println("3")
 
 	resp := struct {
 		CoursePlanID schemas.ID
