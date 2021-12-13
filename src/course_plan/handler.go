@@ -152,7 +152,7 @@ func DuplicateCoursePlan(w http.ResponseWriter, r *http.Request) {
 	newCoursePlan := schemas.CoursePlan{ 
 		Name: coursePlan.Name,
 		Creator: uid,
-		Visibility: coursePlan.Visibility,
+		Visibility: 0,
 	}
 
 	newComponentList := []schemas.CoursePlanComponent{}
@@ -180,7 +180,7 @@ func DuplicateCoursePlan(w http.ResponseWriter, r *http.Request) {
 					Tags: course.Tags,
 					Difficulty: course.Difficulty,
 					Category: course.Category,
-					IsPublic: course.IsPublic,
+					IsPublic: false,
 					CreateTime: time.Now(),
 					Views: 0,
 				}
