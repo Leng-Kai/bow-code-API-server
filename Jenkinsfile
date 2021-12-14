@@ -4,7 +4,7 @@ pipeline {
     
     environment {
         GITHUB_REPO_URL = "https://github.com/Leng-Kai/bow-code-API-server"
-        DEPLOY_URL = "http://localhost:8089/"
+        DEPLOY_URL = "http://localhost:8088/"
     }
     
     stages {
@@ -13,9 +13,9 @@ pipeline {
             steps {
                 echo 'Cloning..'
                 sh "rm -rf ./bow-code-API-server"
-                sh "rm -rf ./bow-code-API-server-dev"
+                sh "rm -rf ./bow-code-API-server-main"
                 sh "git clone $GITHUB_REPO_URL"
-                sh "mv bow-code-API-server bow-code-API-server-dev"
+                sh "mv bow-code-API-server bow-code-API-server-main"
                 sh "ls"
             }
         }
@@ -23,8 +23,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building..'
-                dir("bow-code-API-server-dev") {
-                    sh "git checkout dev"
+                dir("bow-code-API-server-main") {
                     sh "docker-compose up --force-recreate --build -d"
                     sh "docker image prune -f"
                 }
@@ -59,7 +58,7 @@ pipeline {
         
         success {
             discordSend(
-                description: "dev - success",
+                description: "main - success",
                 link: currentBuild.absoluteUrl,
                 result: currentBuild.currentResult,
                 successful: currentBuild.resultIsBetterOrEqualTo('SUCCESS'),
@@ -70,7 +69,7 @@ pipeline {
         
         failure {
             discordSend(
-                description: "dev - failed",
+                description: "main - failed",
                 link: currentBuild.absoluteUrl,
                 result: currentBuild.currentResult,
                 successful: currentBuild.resultIsBetterOrEqualTo('SUCCESS'),
