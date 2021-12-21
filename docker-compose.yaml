@@ -19,8 +19,8 @@ services:
       - 8088:8088
     environment:
       DB_URL: mongodb://root:root@db:27017
-      SELF_URL: https://bow-code.ntu.im/api-server
-      JUDGE0_URL: https://bow-code.ntu.im/judge0
+      SELF_URL: https://codai.tw/api-server
+      JUDGE0_URL: https://codai.tw/judge0
       DOCS_PATH: /data/content
       PORT: 8088
       SESSION_KEY: pekora
