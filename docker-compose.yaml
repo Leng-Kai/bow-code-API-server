@@ -24,4 +24,4 @@ services:
       DOCS_PATH: /data/content
       PORT: 8088
       SESSION_KEY: pekora
-      GOOGLE_CLIENT_ID: 125021518011-3omjnghuvlrmv64tb45v380bo0j1iu20.apps.googleusercontent.com
+      GOOGLE_CLIENT_ID: 217630205559-j55cvvnh4op6okgrv2jc4nko86envo2h.apps.googleusercontent.com
